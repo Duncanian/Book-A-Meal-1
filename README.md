@@ -1,4 +1,4 @@
-![Home Image](https://raw.github.com/lennykioko/Yummy_recipes_2/master/UI/img/strawberry.jpg)
+![Home Image](https://raw.github.com/lennykioko/Book-A-Meal/master/image.jpg)
 
 [![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
