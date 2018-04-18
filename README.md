@@ -1,6 +1,5 @@
 ![Home Image](https://raw.github.com/lennykioko/Book-A-Meal/master/image.jpg)
 
-[![PEP8](https://img.shields.io/badge/code%20style-pep8-orange.svg)](https://www.python.org/dev/peps/pep-0008/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Book-A-Meal
@@ -24,9 +23,6 @@ Book-A-Meal is an application that allows customers to make food orders and help
 ## Built With
 * HTML5
 * CSS3
-* Bootstrap 4
-* JavaScript (ES6)
-* Python 3.6 (PEP 8)
 
 ## Github pages link
 * https://lennykioko.github.io/
@@ -38,4 +34,4 @@ Lenny Kioko.
 To all the wonderful people who have supported me along the way...thank you.
 
 ## License
-The app uses an MIT license
+This repository uses an MIT license
