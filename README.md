@@ -1,6 +1,5 @@
 ![Home Image](https://raw.github.com/lennykioko/Book-A-Meal/master/image.jpg)
 
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Book-A-Meal
@@ -24,8 +23,6 @@ Book-A-Meal is an application that allows customers to make food orders and help
 ## Built With
 * HTML5
 * CSS3
-* JavaScript
-
 
 ## Github pages link
 * https://lennykioko.github.io/
@@ -37,4 +34,4 @@ Lenny Kioko.
 To all the wonderful people who have supported me along the way...thank you.
 
 ## License
-The repository uses an MIT license
+This repository uses an MIT license
