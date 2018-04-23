@@ -4,9 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Admin-Add-Meal</title>
+    <title>Register</title>
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/styles.css">
 </head>
 
 <body>
@@ -20,23 +20,20 @@
 
     <div id="menu-bar-2-container">
         <div id="menu-bar-2">
-            <a href="admin_meals.html">Admin_meals</a>
-            <a href="admin_menu.html">Admin_menu</a>
-            <a href="admin_history.html" id="break-nav-admin">Admin_history</a>
             <a href="index.html">Menu</a>
-            <a href="login.html">Login</a>
-            <a href="#">Logout</a>
         </div>
     </div>
 
     <div class="container">
         <div class="main-form">
             <div class="form">
-                <form action="admin_meals.html">
-                    <h2>Menu Item</h2>
-                    <input type="text" name="menu_item" placeholder="Menu Item">
-                    <input type="text" name="price" placeholder="Price">
-                    <button type="submit" class="button">Save</button>
+                <form action="index.html">
+                    <h2>Create Account</h2>
+                    <input type="email" name="email" placeholder="Email">
+                    <input type="text" name="username" placeholder="Username">
+                    <input type="password" name="password" placeholder="Password">
+                    <input type="password" name="verify_password" placeholder="Verify_password">
+                    <button type="submit" class="button">Register</button>
                 </form>
             </div>
         </div>

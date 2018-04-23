@@ -1,4 +1,4 @@
-![Home Image](https://raw.github.com/lennykioko/Book-A-Meal/master/image.jpg)
+![Home Image](https://raw.github.com/lennykioko/Book-A-Meal/master/static/img/image.jpg)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
