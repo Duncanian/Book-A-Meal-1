@@ -4,9 +4,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Admin-menu</title>
+  <title>Menu</title>
   <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="../static/css/styles.css">
+  <link rel="stylesheet" type="text/css" href="static/css/styles.css">
 </head>
 
 <body>
@@ -17,16 +17,12 @@
   </div>
 
   <div class="clear"></div>
-
   <div id="menu-bar-2-container">
     <div id="menu-bar-2">
-        <a class="shadow">Admin</a>
-        <a href="admin_meals.html">Meals</a>
-        <a href="admin_history.html" id="break-nav-admin">History</a>
-        <a href="menu.html">Menu</a>
-        <a href="index.html">Logout</a>
+      <a href="user_history.html" id="break-nav">History</a>
+      <a href="index.html">Logout</a>
     </div>
-</div>
+  </div>
 
   <div class="container">
     <table class="table">
@@ -35,21 +31,21 @@
         <th>id</th>
         <th>Item</th>
         <th>Price</th>
-        <th>Added to menu</th>
-        <th>Add</th>
-        <th>Remove</th>
+        <th>Quantity (Status)</th>
+        <th>Order</th>
+        <th>Cancel</th>
       </tr>
 
       <tr>
         <td>1</td>
         <td>Chapati and Beef</td>
         <td>400</td>
-        <td>True</td>
+        <td>1 (Processing)</td>
         <td>
-          <a class="button not-active">Add</a>
+          <a class="button" href="#">Order</a>
         </td>
         <td>
-          <a class="button" href="#">Remove</a>
+          <a class="button" href="#">Cancel</a>
         </td>
       </tr>
 
@@ -57,12 +53,12 @@
         <td>2</td>
         <td>Ugali and Sukuma wiki</td>
         <td>300</td>
-        <td>True</td>
+        <td>-</td>
         <td>
-          <a class="button not-active">Add</a>
+          <a class="button" href="#">Order</a>
         </td>
         <td>
-          <a class="button" href="#">Remove</a>
+          <a class="button not-active" href="#">Cancel</a>
         </td>
       </tr>
 
@@ -70,12 +66,12 @@
         <td>3</td>
         <td>Rice and Fish</td>
         <td>600</td>
-        <td>True</td>
+        <td>-</td>
         <td>
-          <a class="button not-active">Add</a>
+          <a class="button" href="login.html">Order</a>
         </td>
         <td>
-          <a class="button" href="#">Remove</a>
+          <a class="button not-active" href="#">Cancel</a>
         </td>
       </tr>
 
@@ -83,12 +79,12 @@
         <td>4</td>
         <td>Fries and Pork</td>
         <td>500</td>
-        <td>True</td>
+        <td>-</td>
         <td>
-          <a class="button not-active">Add</a>
+          <a class="button" href="#">Order</a>
         </td>
         <td>
-          <a class="button" href="#">Remove</a>
+          <a class="button not-active" href="#">Cancel</a>
         </td>
       </tr>
 
@@ -96,12 +92,12 @@
         <td>5</td>
         <td>Chapati and Chicken</td>
         <td>250</td>
-        <td>True</td>
+        <td>-</td>
         <td>
-          <a class="button not-active">Add</a>
+          <a class="button" href="#">Order</a>
         </td>
         <td>
-          <a class="button" href="#">Remove</a>
+          <a class="button not-active" href="#">Cancel</a>
         </td>
       </tr>
 
@@ -109,12 +105,12 @@
         <td>6</td>
         <td>Ugali and Fish</td>
         <td>450</td>
-        <td>False</td>
+        <td>-</td>
         <td>
-          <a class="button" href="#">Add</a>
+          <a class="button" href="#">Order</a>
         </td>
         <td>
-          <a class="button not-active">Remove</a>
+          <a class="button not-active" href="#">Cancel</a>
         </td>
       </tr>
 
@@ -122,12 +118,12 @@
         <td>7</td>
         <td>Rice and Beans</td>
         <td>150</td>
-        <td>False</td>
+        <td>-</td>
         <td>
-          <a class="button" href="#">Add</a>
+          <a class="button" href="#">Order</a>
         </td>
         <td>
-          <a class="button not-active">Remove</a>
+          <a class="button not-active" href="#">Cancel</a>
         </td>
       </tr>
 
