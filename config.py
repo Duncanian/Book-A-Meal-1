@@ -1,6 +1,4 @@
 """Contains various settings for each process of development
-Created: April 2018
-Author: Lenny
 """
 
 class Config(object):
@@ -10,9 +8,8 @@ class Config(object):
 
 
 class TestingConfig(Config):
+    DEBUG = True
     TESTING = True
 
 class DevelopmentConfig(Config):
     DEBUG = True
-
-# class ProductionConfig(Config):

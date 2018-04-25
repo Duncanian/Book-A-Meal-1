@@ -1,3 +1,5 @@
+"""Test the users and user endpoint on all methods and covers most edge cases
+"""
 import unittest
 import json
 import unittest
@@ -8,17 +10,17 @@ import config
 app.config.from_object('config.TestingConfig')
 
 
-class APITests(unittest.TestCase):
-    """Tests all functionality of the API"""
+class UserTests(unittest.TestCase):
+    """Tests functionality of the API"""
 
 
     def setUp(self):
         """Initialize important variables and makes them easily availabe through the self keyword"""
-        app.testing = True
         self.app = app.test_client()
         self.data = json.dumps({"username" : "balotelli", "email" : "balotelli@gmail.com",
                            "password" : "secret12345", "confirm_password" : "secret12345"})
         self.existing_user = self.app.post('/api/v1/auth/signup', data=self.data, content_type='application/json')
+
        
     def test_get_all_users(self):
         """Tests successfully getting all users through the users endpoint"""
@@ -117,7 +119,7 @@ class APITests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
     
     def test_updating_non_existing_user(self):
-        """Test a successful user update"""
+        """Test updating non_existing user"""
         data = json.dumps({"username" : "balotelli", "email" : "mariobalotelli@gmail.com",
                            "password" : "secret12345", "confirm_password" : "secret12345"})
         response = self.app.put('/api/v1/users/99', data=data, content_type='application/json')
@@ -132,22 +134,6 @@ class APITests(unittest.TestCase):
         """Test a deleting user that does not exist"""
         response = self.app.delete('/api/v1/users/15')
         self.assertEqual(response.status_code, 404)
-
-# testing Meals
-
-    def test_get_all_meals(self):
-        """Tests successfully getting all meals through the meals endpoint"""
-        response = self.app.get('/api/v1/meals')
-        self.assertEqual(response.status_code, 200)
-
-    def test_successful_meal_creation(self):
-        """Tests successfully creating a new meal through the meals endpoint"""
-        data = json.dumps({"name" : "Rice and Beans", "price" : 400})
-        response = self.app.post('/api/v1/meals', data=data, content_type='application/json')
-        result = json.loads(response.data)
-        self.assertEqual(result.get("name"), "Rice and Beans")
-        self.assertEqual(result.get("price"), '400')
-        self.assertEqual(response.status_code, 201)
 
 
 if __name__ == '__main__':

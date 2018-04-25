@@ -1,7 +1,4 @@
 """Contains all endpoints to manipulate user information
-
-Created: April 2018
-Author: Lenny
 """
 
 from flask import Blueprint, jsonify, make_response
@@ -15,7 +12,7 @@ class UserList(Resource):
 
 
     def __init__(self):
-        "Validates input  from the form as well as json input"
+        "Validates input from the form as well as json input"
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'username',
@@ -65,7 +62,6 @@ class UserList(Resource):
         return make_response(jsonify(data.all_users), 200)
 
 
-# testing responses using Postman
 class User(Resource):
     def __init__(self):
         "Validates input from the form as well as json input"
@@ -103,6 +99,7 @@ class User(Resource):
             return make_response(jsonify({"message" : "User does not exist"}), 404)
 
     def put(self, user_id):
+        """Update a particular user"""
         kwargs = self.reqparse.parse_args()
         result = data.User.update_user(user_id, **kwargs)
         if result != {"message" : "User does not exist"}:
@@ -111,6 +108,7 @@ class User(Resource):
             return make_response(jsonify(result), 404)
 
     def delete(self, user_id):
+        """Delete a particular user"""
         result = data.User.delete_user(user_id)
         if result != {"message" : "User does not exist"}:
             return make_response(jsonify(result), 200)
