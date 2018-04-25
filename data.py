@@ -11,6 +11,9 @@ meal_count = 1
 all_menu = {}
 menu_count = 1
 
+all_orders = {}
+order_count = 1
+
 class User(object):
     """Contains methods to add, update and delete a user"""
 
@@ -107,3 +110,35 @@ class Menu(object):
             return {"message" : "Meal successfully deleted"}
         except KeyError:
             return {"message" : "Meal does not exist"}
+
+
+class Order(object):
+    """Contains methods to add, update and delete orders"""
+
+
+    @staticmethod
+    def create_order(name, price, **kwargs):
+        """Creates a new order and appends this information to the all_orders dictionary"""
+        global all_orders
+        global order_count
+        all_orders[order_count] = {"id": order_count, "name" : name, "price": price}
+        new_order = all_orders[order_count]
+        order_count += 1
+        return new_order
+
+    @staticmethod
+    def update_order(order_id, name, price, **kwargs):
+        """Updates order information"""
+        if order_id in all_orders.keys():
+            all_orders[order_id] = {"id": order_id, "name" : name, "price" : price}
+            return all_orders[order_id]
+        return {"message" : "Order does not exist"}
+
+    @staticmethod
+    def delete_order(order_id):
+        """Deletes a order"""
+        try:
+            del all_orders[order_id]
+            return {"message" : "Order successfully deleted"}
+        except KeyError:
+            return {"message" : "Order does not exist"}
