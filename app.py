@@ -1,6 +1,6 @@
 """Creates app instance, registers Blueprints and runs the Flask application
 """
-from flask import Flask, g, jsonify
+from flask import Flask
 
 from resources.meals import meals_api
 from resources.users import users_api
