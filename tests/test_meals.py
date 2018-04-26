@@ -4,8 +4,9 @@ import unittest
 import json
 import unittest
 
-import sys # fix import errors
-sys.path.append('..')
+import sys, os # fix import errors
+sys.path.insert(0,
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import config
 import app
