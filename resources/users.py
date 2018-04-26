@@ -4,7 +4,7 @@
 from flask import Blueprint, jsonify, make_response
 from flask_restful import Resource, Api, reqparse, inputs
 
-import data
+import models as data
 
 class Signup(Resource):
     "Contains a POST method to register a new user"
