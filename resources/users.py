@@ -61,6 +61,36 @@ class Signup(Resource):
             return jsonify({"message" : "password should be at least 8 characters"})
         return jsonify({"message" : "password and confirm password should be identical"})
 
+class Login(Resource):
+    "Contains a POST method to login a user"
+
+
+    def __init__(self):
+        "Validates input from the form as well as json input"
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument(
+            'email',
+            required=True,
+            help='kindly provide a valid email address',
+            location=['form', 'json'],
+            type=inputs.regex(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"))
+        self.reqparse.add_argument(
+            'password',
+            required=True,
+            trim=True,
+            help='kindly provide a valid password',
+            location=['form', 'json'])
+        super().__init__()
+
+    def post(self):
+        """login a user"""
+        kwargs = self.reqparse.parse_args()
+        for user_id in data.all_users:
+            if data.all_users.get(user_id)["email"] == kwargs.get('email') and data.all_users.get(user_id)["password"] == kwargs.get('password'):
+                return make_response(jsonify({"message" : "you have been successfully logged in"}), 200)
+            return make_response(jsonify({"message" : "invalid email address or password"}), 401) # deliberately ambigous
+        
+
 
 class UserList(Resource):
     "Contains a POST method to register a new user and a GET method to get all users"
@@ -193,5 +223,6 @@ class User(Resource):
 users_api = Blueprint('resources.users', __name__)
 api = Api(users_api)
 api.add_resource(Signup, '/auth/signup', endpoint='signup')
+api.add_resource(Login, '/auth/login', endpoint='login')
 api.add_resource(UserList, '/users', endpoint='users')
 api.add_resource(User, '/users/<int:user_id>', endpoint='user')

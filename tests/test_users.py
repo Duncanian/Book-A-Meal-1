@@ -4,9 +4,13 @@ import unittest
 import json
 import unittest
 
-from app import app
+import sys # fix import errors
+sys.path.append('..')
+
+import app
 import config
 
+app = app.create_app()
 app.config.from_object('config.TestingConfig')
 
 
@@ -42,7 +46,7 @@ class UserTests(unittest.TestCase):
         """Tests unsuccessfully creating a new user because of existing email"""
         data = json.dumps({"username" : "john", "email" : "johnmuiya24@gmail.com",
                            "password" : "secret12345", "confirm_password" : "secret12345"})
-        response = self.app.post('/api/v1/users', data=data, content_type='application/json')
+        response = self.app.post('/api/v1/users', data=data, content_type='application/json') # pylint: disable=W0612
         response2 = self.app.post('/api/v1/users', data=data, content_type='application/json')
         result = json.loads(response2.data)
         self.assertEqual(result.get("message"), "user with that email already exists")
@@ -127,7 +131,7 @@ class UserTests(unittest.TestCase):
         """Tests unsuccessfully creating a new user because of existing email"""
         data = json.dumps({"username" : "john", "email" : "johnmuiya@gmail.com",
                            "password" : "secret12345", "confirm_password" : "secret12345"})
-        response = self.app.post('/api/v1/auth/signup', data=data, content_type='application/json')
+        response = self.app.post('/api/v1/auth/signup', data=data, content_type='application/json') # pylint: disable=W0612
         response2 = self.app.post('/api/v1/auth/signup', data=data, content_type='application/json')
         result = json.loads(response2.data)
         self.assertEqual(result.get("message"), "user with that email already exists")
@@ -219,6 +223,48 @@ class UserTests(unittest.TestCase):
         """Test a deleting user that does not exist"""
         response = self.app.delete('/api/v1/users/15')
         self.assertEqual(response.status_code, 404)
+
+
+    # testing api/vi/login
+    def test_successful_login(self):
+        """Test a successful login"""
+        data = json.dumps({"email" : "balotelli@gmail.com", "password" : "secret12345"})
+        response = self.app.post('/api/v1/auth/login', data=data, content_type='application/json')
+        result = json.loads(response.data)
+        self.assertEqual(result.get("message"), "you have been successfully logged in")
+        self.assertEqual(response.status_code, 200)
+    
+    def test_login_invalid_email(self):
+        """Test a unsuccessful because of email that does not pass email regex"""
+        data = json.dumps({"email" : "balotelligmail.com", "password" : "secret12345"})
+        response = self.app.post('/api/v1/auth/login', data=data, content_type='application/json')
+        result = json.loads(response.data)
+        self.assertEqual(result.get("message"), {"email": "kindly provide a valid email address"})
+        self.assertEqual(response.status_code, 400)
+
+    def test_login_wrong_email(self):
+        """Test a unsuccessful login because of wrong email"""
+        data = json.dumps({"email" : "alotelli@gmail.com", "password" : "secret12345"})
+        response = self.app.post('/api/v1/auth/login', data=data, content_type='application/json')
+        result = json.loads(response.data)
+        self.assertEqual(result.get("message"), "invalid email address or password")
+        self.assertEqual(response.status_code, 401)
+    
+    def test_login_empty_password(self):
+        """Test a unsuccessful login because of empty password"""
+        data = json.dumps({"email" : "balotelli@gmail.com", "password" : ""})
+        response = self.app.post('/api/v1/auth/login', data=data, content_type='application/json')
+        result = json.loads(response.data)
+        self.assertEqual(result.get("message"), "invalid email address or password")
+        self.assertEqual(response.status_code, 401)
+
+    def test_login_wrong_password(self):
+        """Test a unsuccessful login because of wrong password"""
+        data = json.dumps({"email" : "balotelli@gmail.com", "password" : "mysecerto78"})
+        response = self.app.post('/api/v1/auth/login', data=data, content_type='application/json')
+        result = json.loads(response.data)
+        self.assertEqual(result.get("message"), "invalid email address or password")
+        self.assertEqual(response.status_code, 401)
 
 
 if __name__ == '__main__':

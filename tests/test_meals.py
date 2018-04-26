@@ -4,9 +4,13 @@ import unittest
 import json
 import unittest
 
-from app import app
-import config
+import sys # fix import errors
+sys.path.append('..')
 
+import config
+import app
+
+app = app.create_app()
 app.config.from_object('config.TestingConfig')
 
 

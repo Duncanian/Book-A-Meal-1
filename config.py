@@ -1,8 +1,10 @@
 """Contains various settings for each process of development
 """
+import os
 
 class Config(object):
     """Base class with all the constant config variables"""
+    basedir = os.path.abspath(os.path.dirname(__file__))
     DEBUG = False
     TESTING = False
     SECRET_KEY = "!@#_)&^%$$epic8^%%$#@#%^&*(&^&"
