@@ -48,6 +48,35 @@ $ python app.py
 
 At the / endpoint you should see Hello world displayed in your browser.
 
+## Endpoints
+
+Here is a list of all endpoints in the Book-A-Meal API
+
+Endpoint | Functionality 
+------------ | -------------
+POST /api/v1/auth/signup | Register a user
+POST /api/v1/auth/login | Log in user
+POST /api/v1/users | Register a user
+GET /api/v1/users | Get all users
+GET /api/v1/users/id | Get a single user
+PUT /api/v1/users/id | Update a single user
+DELETE /api/v1/users/id | Delte a single user
+POST /api/v1/meals | Create new meal item
+GET /api/v1/meals | Get all meal items
+GET /api/v1/meals/id | Get a single meal item
+PUT /api/v1/meals/id | Update a single meal item
+DELETE /api/v1/meals/id | Delete a single meal item
+POST /api/v1/menu | Create new menu option
+GET /api/v1/menu | Get all menu options
+GET /api/v1/menu/id | Get a single menu option
+PUT /api/v1/menu/id | Update a single menu option
+DELETE /api/v1/menu/id | Delete a single menu option
+POST /api/v1/orders | Create new order item
+GET /api/v1/orders | Get all order items
+GET /api/v1/orders/id | Get a single order item
+PUT /api/v1/orders/id | Update a single order item
+DELETE /api/v1/orders/id | Delete a single order item
+
 ## Running the tests
 
 To run the automated tests simply run
