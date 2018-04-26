@@ -24,7 +24,7 @@ class MealTests(unittest.TestCase):
         self.app = app.test_client()
         self.meal = json.dumps({"meal_item" : "Spicy Pilau", "price" : 600})
         self.menu = json.dumps({"menu_option" : "Spicy Pilau", "price" : 600})
-        self.order = json.dumps({"order_item" : "Spicy Pilau", "price" : 600})
+        self.order = json.dumps({"order_item" : "Spiced Pilau", "price" : 500})
         self.existing_meal = self.app.post('/api/v1/meals', data=self.meal, content_type='application/json')
         self.existing_menu = self.app.post('/api/v1/menu', data=self.menu, content_type='application/json')
         self.existing_order = self.app.post('/api/v1/orders', data=self.order, content_type='application/json')
@@ -220,7 +220,7 @@ class MealTests(unittest.TestCase):
         self.assertEqual(result.get("message"), {"price": "kindly provide a price(should be a valid number)"})
 
     def test_get_one_order(self):
-        """Tests successfully getting an order_item through the orders endpoint"""
+        """Tests successfully getting an order item through the orders endpoint"""
         response = self.app.get('/api/v1/orders/1')
         self.assertEqual(response.status_code, 200)
     
@@ -238,7 +238,7 @@ class MealTests(unittest.TestCase):
     def test_updating_non_existing_order(self):
         """Test updating non_existing order_item"""
         data = json.dumps({"order_item" : "Pilau with spices", "price" : 600})
-        response = self.app.put('/api/v1/orders/99', data=data, content_type='application/json')
+        response = self.app.put('/api/v1/orders/45', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 404)
     
     def test_successfully_deleting_one_order(self):
