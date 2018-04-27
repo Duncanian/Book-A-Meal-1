@@ -167,7 +167,7 @@ class OrderList(Resource):
 
 
     def __init__(self):
-        self.now = datetime.datetime.now() # timer
+        self.now = datetime.time(10, 0, 0) # timer
         self.closing = datetime.time(15, 0, 0)
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('order_item',
@@ -201,7 +201,7 @@ class Order(Resource):
 
 
     def __init__(self):
-        self.now = datetime.datetime.now() # timer
+        self.now = datetime.time(10, 0, 0) # timer
         self.closing = datetime.time(15, 0, 0)
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument('order_item',
