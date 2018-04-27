@@ -4,9 +4,9 @@ import unittest
 import json
 import unittest
 
-import sys, os # fix import errors
-sys.path.insert(0,
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import sys # fix import errors
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import app
 import config
@@ -23,15 +23,16 @@ class UserTests(unittest.TestCase):
         """Initialize important variables and makes them easily availabe through the self keyword"""
         self.app = app.test_client()
         self.data = json.dumps({"username" : "balotelli", "email" : "balotelli@gmail.com",
-                           "password" : "secret12345", "confirm_password" : "secret12345"})
-        self.existing_user = self.app.post('/api/v1/auth/signup', data=self.data, content_type='application/json')
+                                "password" : "secret12345", "confirm_password" : "secret12345"})
+        self.existing_user = self.app.post('/api/v1/auth/signup',
+                                           data=self.data, content_type='application/json')
 
     # testing api/vi/users
     def test_get_all_users(self):
         """Tests successfully getting all users through the users endpoint"""
         response = self.app.get('/api/v1/users')
         self.assertEqual(response.status_code, 200)
-    
+
     def test_successful_user_creation(self):
         """Tests successfully creating a new user through the users endpoint"""
         data = json.dumps({"username" : "marcus23", "email" : "marcusrahford44@gmail.com",
@@ -42,7 +43,7 @@ class UserTests(unittest.TestCase):
         self.assertEqual(result.get("email"), "marcusrahford44@gmail.com")
         self.assertEqual(result.get("password"), "secret12345")
         self.assertEqual(response.status_code, 201)
-    
+
     def test_create_user_using_existing_email(self):
         """Tests unsuccessfully creating a new user because of existing email"""
         data = json.dumps({"username" : "john", "email" : "johnmuiya24@gmail.com",
@@ -69,19 +70,19 @@ class UserTests(unittest.TestCase):
         self.assertEqual(result.get("message"), "password should be at least 8 characters")
 
     def test_create_user_empty_username(self):
-        """Tests unsuccessfully creating a new user because of empty username"""
+        """Test creating a new user using empty username"""
         data = json.dumps({"username" : "", "email" : "lennykmutua@gmail.com", "password" : "secret", "confirm_password" : "secret"})
         response = self.app.post('/api/v1/users', data=data, content_type='application/json')
         result = json.loads(response.data)
         self.assertEqual(result.get("message"), {"username": "kindly provide a valid username"})
     
     def test_create_user_empty_email(self):
-        """Tests unsuccessfully creating a new user because of empty email"""
+        """Test creating a new user using empty email"""
         data = json.dumps({"username" : "lenny", "email" : "", "password" : "secret", "confirm_password" : "secret"})
         response = self.app.post('/api/v1/users', data=data, content_type='application/json')
         result = json.loads(response.data)
         self.assertEqual(result.get("message"), {"email": "kindly provide a valid email address"})
-    
+
     def test_create_user_invalid_email(self):
         """Tests unsuccessfully creating a new user because of invalid email"""
         data = json.dumps({"username" : "lenny", "email" : "lennykmugmail.com",
@@ -106,7 +107,7 @@ class UserTests(unittest.TestCase):
         response = self.app.post('/api/v1/users', data=data, content_type='application/json')
         result = json.loads(response.data)
         self.assertEqual(result.get("message"), "password and confirm password should be identical")
-    
+
     def test_create_user_whitespace_passwords(self):
         """Tests unsuccessfully creating a new user because of providing whitespace passwords"""
         data = json.dumps({"username" : "lenny", "email" : "lennykmutua@gmail.com",
@@ -127,7 +128,7 @@ class UserTests(unittest.TestCase):
         self.assertEqual(result.get("email"), "marcusrahford@gmail.com")
         self.assertEqual(result.get("password"), "secret12345")
         self.assertEqual(response.status_code, 201)
-    
+
     def test_signup_using_existing_email(self):
         """Tests unsuccessfully creating a new user because of existing email"""
         data = json.dumps({"username" : "john", "email" : "johnmuiya@gmail.com",

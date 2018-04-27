@@ -4,11 +4,11 @@ import unittest
 import json
 import unittest
 
-import sys, os # fix import errors
-sys.path.insert(0,
-    os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import sys
+import os # fix import errors
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import config
+
 import app
 
 app = app.create_app()
@@ -25,10 +25,13 @@ class MealTests(unittest.TestCase):
         self.meal = json.dumps({"meal_item" : "Spicy Pilau", "price" : 600})
         self.menu = json.dumps({"menu_option" : "Spicy Pilau", "price" : 600})
         self.order = json.dumps({"order_item" : "Spiced Pilau", "price" : 500})
-        self.existing_meal = self.app.post('/api/v1/meals', data=self.meal, content_type='application/json')
-        self.existing_menu = self.app.post('/api/v1/menu', data=self.menu, content_type='application/json')
-        self.existing_order = self.app.post('/api/v1/orders', data=self.order, content_type='application/json')
-    
+        self.existing_meal = self.app.post('/api/v1/meals', data=self.meal,
+                                            content_type='application/json')
+        self.existing_menu = self.app.post('/api/v1/menu', data=self.menu,
+                                            content_type='application/json')
+        self.existing_order = self.app.post('/api/v1/orders', data=self.order,
+                                            content_type='application/json')
+
     def test_get_all_meals(self):
         """Tests successfully getting all meals through the meals endpoint"""
         response = self.app.get('/api/v1/meals')
@@ -50,20 +53,21 @@ class MealTests(unittest.TestCase):
         response2 = self.app.post('/api/v1/meals', data=data, content_type='application/json')
         result = json.loads(response2.data)
         self.assertEqual(result.get("message"), "meal item with that name already exists")
-    
+
     def test_create_meal_empty_name(self):
         """Tests unsuccessfully creating a new meal because of empty meal item"""
         data = json.dumps({"meal_item" : "", "price" : 400})
         response = self.app.post('/api/v1/meals', data=data, content_type='application/json')
         result = json.loads(response.data)
         self.assertEqual(result.get("message"), {"meal_item": "kindly provide a meal item"})
-    
+
     def test_create_meal_empty_price(self):
         """Tests unsuccessfully creating a new meal because of empty price"""
         data = json.dumps({"meal_item" : "Ugali and Chicken", "price" : ""})
         response = self.app.post('/api/v1/meals', data=data, content_type='application/json')
         result = json.loads(response.data)
-        self.assertEqual(result.get("message"), {"price": "kindly provide a price(should be a valid number)"})
+        self.assertEqual(result.get("message"), {"price":
+                                                 "kindly provide a price(should be a valid number)"})
     
     def test_create_meal_invalid_price(self):
         """Tests unsuccessfully creating a new meal because of empty price"""

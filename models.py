@@ -1,6 +1,5 @@
 """Handles data storage for Users, Meals and Orders
 """
-import json
 
 all_users = {}
 user_count = 1
@@ -24,7 +23,7 @@ class User(object):
         global all_users
         global user_count
         all_users[user_count] = {"id": user_count, "username" : username,
-                         "email" : email, "password" : password, "admin" : admin}
+                                 "email" : email, "password" : password, "admin" : admin}
         new_user = all_users[user_count]
         user_count += 1
         return new_user
@@ -50,7 +49,7 @@ class User(object):
 
 class Meal(object):
     """Contains methods to add, update and delete a meal item"""
-    
+
 
     @staticmethod
     def create_meal(meal_item, price, **kwargs):

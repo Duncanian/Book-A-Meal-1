@@ -6,6 +6,7 @@ from resources.meals import meals_api
 from resources.users import users_api
 
 def create_app():
+    """Create flask app"""
     app = Flask(__name__)
     app.config.from_object('config.DevelopmentConfig')
     app.url_map.strict_slashes = False
