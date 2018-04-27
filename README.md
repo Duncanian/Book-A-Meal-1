@@ -105,9 +105,13 @@ Ensure you use Productionconfig settings which have DEBUG set to False
 * Python 3.6.4
 * Flask - The web framework used
 
-## Github pages link
+## GitHub pages
 
 https://lennykioko.github.io/
+
+## Heroku
+
+
 
 ## Versioning
 
