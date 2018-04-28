@@ -86,10 +86,13 @@ class Login(Resource):
         """login a user"""
         kwargs = self.reqparse.parse_args()
         for user_id in data.all_users:
-            if data.all_users.get(user_id)["email"] == kwargs.get('email') and data.all_users.get(user_id)["password"] == kwargs.get('password'):
-                return make_response(jsonify({"message" : "you have been successfully logged in"}), 200)
-            return make_response(jsonify({"message" : "invalid email address or password"}), 401) # deliberately ambigous
-        
+            if data.all_users.get(user_id)["email"] == kwargs.get('email') and \
+                data.all_users.get(user_id)["password"] == kwargs.get('password'):
+                return make_response(jsonify({"message" : """you have been
+                                              successfully logged in"""}), 200)
+            return make_response(jsonify({"message" : """invalid email
+                                          address or password"""}), 401) # deliberately ambigous
+
 
 
 class UserList(Resource):
@@ -207,16 +210,14 @@ class User(Resource):
         result = data.User.update_user(user_id, **kwargs)
         if result != {"message" : "user does not exist"}:
             return make_response(jsonify(result), 200)
-        else:
-            return make_response(jsonify(result), 404)
+        return make_response(jsonify(result), 404)
 
     def delete(self, user_id):
         """Delete a particular user"""
         result = data.User.delete_user(user_id)
         if result != {"message" : "user does not exist"}:
             return make_response(jsonify(result), 200)
-        else:
-            return make_response(jsonify(result), 404)
+        return make_response(jsonify(result), 404)
 
 
 

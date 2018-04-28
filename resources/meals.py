@@ -14,12 +14,14 @@ class MealList(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('meal_item',
+        self.reqparse.add_argument(
+            'meal_item',
             required=True,
             type=inputs.regex(r"(.*\S.*)"),
             help='kindly provide a meal item',
-            location=['form', 'json']) # the one that comes last is looked at  first
-        self.reqparse.add_argument('price',
+            location=['form', 'json'])
+        self.reqparse.add_argument(
+            'price',
             required=True,
             type=float,
             help='kindly provide a price(should be a valid number)',
@@ -47,12 +49,14 @@ class Meal(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('meal_item',
+        self.reqparse.add_argument(
+            'meal_item',
             required=True,
             type=inputs.regex(r"(.*\S.*)"),
             help='kindly provide a meal item',
-            location=['form', 'json']) # the one that comes last is looked at  first
-        self.reqparse.add_argument('price',
+            location=['form', 'json'])
+        self.reqparse.add_argument(
+            'price',
             required=True,
             type=float,
             help='kindly provide a price(should be a valid number)',
@@ -73,16 +77,14 @@ class Meal(Resource):
         result = data.Meal.update_meal(meal_id, **kwargs)
         if result != {"message" : "meal item does not exist"}:
             return make_response(jsonify(result), 200)
-        else:
-            return make_response(jsonify(result), 404)
+        return make_response(jsonify(result), 404)
 
     def delete(self, meal_id):
         """Delete a particular meal"""
         result = data.Meal.delete_meal(meal_id)
         if result != {"message" : "meal item does not exist"}:
             return make_response(jsonify(result), 200)
-        else:
-            return make_response(jsonify(result), 404)
+        return make_response(jsonify(result), 404)
 
 class MenuList(Resource):
     """Contains GET and POST methods for manipulating menu data"""
@@ -90,12 +92,14 @@ class MenuList(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('menu_option',
+        self.reqparse.add_argument(
+            'menu_option',
             required=True,
             type=inputs.regex(r"(.*\S.*)"),
             help='kindly provide a menu option',
             location=['form', 'json'])
-        self.reqparse.add_argument('price',
+        self.reqparse.add_argument(
+            'price',
             required=True,
             type=float,
             help='kindly provide a price(should be a valid number)',
@@ -124,12 +128,14 @@ class Menu(Resource):
 
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('menu_option',
+        self.reqparse.add_argument(
+            'menu_option',
             required=True,
             type=inputs.regex(r"(.*\S.*)"),
             help='kindly provide a menu option',
             location=['form', 'json'])
-        self.reqparse.add_argument('price',
+        self.reqparse.add_argument(
+            'price',
             required=True,
             type=float,
             help='kindly provide a price(should be a valid number)',
@@ -150,16 +156,14 @@ class Menu(Resource):
         result = data.Menu.update_menu(menu_id, **kwargs)
         if result != {"message" : "menu option does not exist"}:
             return make_response(jsonify(result), 200)
-        else:
-            return make_response(jsonify(result), 404)
+        return make_response(jsonify(result), 404)
 
     def delete(self, menu_id):
         """Delete a particular menu option"""
         result = data.Menu.delete_menu(menu_id)
         if result != {"message" : "menu option does not exist"}:
             return make_response(jsonify(result), 200)
-        else:
-            return make_response(jsonify(result), 404)
+        return make_response(jsonify(result), 404)
 
 
 class OrderList(Resource):
@@ -170,12 +174,14 @@ class OrderList(Resource):
         self.now = datetime.time(10, 0, 0) # timer
         self.closing = datetime.time(15, 0, 0)
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('order_item',
+        self.reqparse.add_argument(
+            'order_item',
             required=True,
             type=inputs.regex(r"(.*\S.*)"),
             help='kindly provide an order item',
             location=['form', 'json'])
-        self.reqparse.add_argument('price',
+        self.reqparse.add_argument(
+            'price',
             required=True,
             type=float,
             help='kindly provide a price(should be a valid number)',
@@ -188,7 +194,8 @@ class OrderList(Resource):
         if self.now.hour < self.closing.hour:
             result = data.Order.create_order(**kwargs)
             return make_response(jsonify(result), 201)
-        return make_response(jsonify({"message" : "sorry, you cannot make an order past 10PM"}), 200)
+        return make_response(jsonify({"message" : """sorry, you cannot make
+                                      an order past 10PM"""}), 200)
 
 
     def get(self):
@@ -204,12 +211,14 @@ class Order(Resource):
         self.now = datetime.time(10, 0, 0) # timer
         self.closing = datetime.time(15, 0, 0)
         self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument('order_item',
+        self.reqparse.add_argument(
+            'order_item',
             required=True,
             type=inputs.regex(r"(.*\S.*)"),
             help='kindly provide an order item',
             location=['form', 'json'])
-        self.reqparse.add_argument('price',
+        self.reqparse.add_argument(
+            'price',
             required=True,
             type=float,
             help='kindly provide a price(should be a valid number)',
@@ -231,18 +240,17 @@ class Order(Resource):
             result = data.Order.update_order(order_id, **kwargs)
             if result != {"message" : "order item does not exist"}:
                 return make_response(jsonify(result), 200)
-            else:
-                return make_response(jsonify(result), 404)
-        return make_response(jsonify({"message" : "sorry, you cannot modify an order past 10PM"}), 200)
-        
+            return make_response(jsonify(result), 404)
+        return make_response(jsonify({"message" : """sorry, you cannot
+                                      modify an order past 10PM"""}), 200)
+
 
     def delete(self, order_id):
         """Delete a particular order"""
         result = data.Order.delete_order(order_id)
         if result != {"message" : "order item does not exist"}:
             return make_response(jsonify(result), 200)
-        else:
-            return make_response(jsonify(result), 404)
+        return make_response(jsonify(result), 404)
 
 
 meals_api = Blueprint('resources.meals', __name__)
