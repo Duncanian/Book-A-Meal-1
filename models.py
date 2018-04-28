@@ -13,6 +13,7 @@ menu_count = 1
 all_orders = {}
 order_count = 1
 
+
 class User(object):
     """Contains methods to add, update and delete a user"""
 
