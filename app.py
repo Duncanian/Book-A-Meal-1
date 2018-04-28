@@ -1,5 +1,7 @@
 """Creates app instance, registers Blueprints and runs the Flask application
 """
+import os
+
 from flask import Flask
 
 from resources.meals import meals_api
@@ -25,4 +27,5 @@ def hello_world():
 
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run('', port=port)
