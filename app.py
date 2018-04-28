@@ -3,8 +3,6 @@
 import os
 
 from flask import Flask
-from flask_limiter import Limiter
-from flask_limiter.util import get_ipaddr
 
 from resources.meals import meals_api
 from resources.users import users_api
@@ -17,12 +15,6 @@ def create_app():
 
     app.register_blueprint(meals_api, url_prefix='/api/v1')
     app.register_blueprint(users_api, url_prefix='/api/v1')
-
-    # set up limiter to prevent Dos attacks
-    DEFAULT_RATE = "150/hour"
-    limiter = Limiter(app, default_limits=[DEFAULT_RATE], key_func=get_ipaddr)
-    limiter.limit(DEFAULT_RATE, per_method=True, methods=['POST', 'PUT', 'DELETE'])(users_api) 
-    limiter.limit(DEFAULT_RATE, per_method=True, methods=['POST', 'PUT', 'DELETE'])(meals_api)
 
     return app
 
