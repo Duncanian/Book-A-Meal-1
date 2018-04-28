@@ -48,7 +48,7 @@ $ python app.py
 
 5. Navigate to [http://localhost:5000](http://localhost:5000)
 
-At the / endpoint you should see Hello world displayed in your browser.
+At the / endpoint you should see Welcome to Book-A-Meal API displayed in your browser.
 
 ## Endpoints
 
@@ -125,7 +125,7 @@ Lenny Kioko.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
 

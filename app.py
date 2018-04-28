@@ -23,7 +23,7 @@ app = create_app()
 @app.route('/')
 def hello_world():
     "test that flask app is running"
-    return 'Hello World'
+    return 'Welcome to Book-A-Meal API'
 
 
 if __name__ == '__main__':
