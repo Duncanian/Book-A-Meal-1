@@ -66,16 +66,14 @@ class MealTests(unittest.TestCase):
         data = json.dumps({"meal_item" : "Ugali and Chicken", "price" : ""})
         response = self.app.post('/api/v1/meals', data=data, content_type='application/json')
         result = json.loads(response.data)
-        self.assertEqual(result.get("message"), {"price": """kindly provide a price
-                                                 (should be a valid number)"""})
+        self.assertEqual(result.get("message"), {"price": "kindly provide a price(should be a valid number)"})
 
     def test_create_meal_invalid_price(self):
         """Tests unsuccessfully creating a new meal because of empty price"""
         data = json.dumps({"meal_item" : "Ugali", "price" : "four hundred"})
         response = self.app.post('/api/v1/meals', data=data, content_type='application/json')
         result = json.loads(response.data)
-        self.assertEqual(result.get("message"), {"price": """kindly provide a price
-                                                 (should be a valid number)"""})
+        self.assertEqual(result.get("message"), {"price": "kindly provide a price(should be a valid number)"})
 
     def test_get_one_meal(self):
         """Tests successfully getting a meal item through the meals endpoint"""
@@ -146,16 +144,14 @@ class MealTests(unittest.TestCase):
         data = json.dumps({"menu_option" : "Ugali and Kuku", "price" : ""})
         response = self.app.post('/api/v1/menu', data=data, content_type='application/json')
         result = json.loads(response.data)
-        self.assertEqual(result.get("message"), {"price": """kindly provide a price
-                                                 (should be a valid number)"""})
+        self.assertEqual(result.get("message"), {"price": "kindly provide a price(should be a valid number)"})
 
     def test_create_menu_invalid_price(self):
         """Tests unsuccessfully creating a new menu item because of invalid price"""
         data = json.dumps({"menu_option" : "Mchele and Pork", "price" : "one hundred"})
         response = self.app.post('/api/v1/menu', data=data, content_type='application/json')
         result = json.loads(response.data)
-        self.assertEqual(result.get("message"), {"price": """kindly provide a price
-                                                 (should be a valid number)"""})
+        self.assertEqual(result.get("message"), {"price": "kindly provide a price(should be a valid number)"})
 
     def test_get_one_menu(self):
         """Tests successfully getting a menu option through the menu endpoint"""
@@ -217,16 +213,14 @@ class MealTests(unittest.TestCase):
         data = json.dumps({"order_item" : "Ugali and Kuku", "price" : ""})
         response = self.app.post('/api/v1/orders', data=data, content_type='application/json')
         result = json.loads(response.data)
-        self.assertEqual(result.get("message"), {"price": """kindly provide a price
-                                                 (should be a valid number)"""})
+        self.assertEqual(result.get("message"), {"price": "kindly provide a price(should be a valid number)"})
 
     def test_create_order_invalid_price(self):
         """Tests unsuccessfully creating a new order item because of invalid price"""
         data = json.dumps({"order_item" : "Mchele and Pork", "price" : "one hundred"})
         response = self.app.post('/api/v1/orders', data=data, content_type='application/json')
         result = json.loads(response.data)
-        self.assertEqual(result.get("message"), {"price": """kindly provide a price
-                                                 (should be a valid number)"""})
+        self.assertEqual(result.get("message"), {"price": "kindly provide a price(should be a valid number)"})
 
     def test_get_one_order(self):
         """Tests successfully getting an order item through the orders endpoint"""

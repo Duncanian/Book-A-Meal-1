@@ -194,8 +194,7 @@ class OrderList(Resource):
         if self.now.hour < self.closing.hour:
             result = data.Order.create_order(**kwargs)
             return make_response(jsonify(result), 201)
-        return make_response(jsonify({"message" : """sorry, you cannot make
-                                      an order past 10PM"""}), 200)
+        return make_response(jsonify({"message" : "sorry, you cannot make an order past 10PM"}), 200)
 
 
     def get(self):
@@ -241,8 +240,7 @@ class Order(Resource):
             if result != {"message" : "order item does not exist"}:
                 return make_response(jsonify(result), 200)
             return make_response(jsonify(result), 404)
-        return make_response(jsonify({"message" : """sorry, you cannot
-                                      modify an order past 10PM"""}), 200)
+        return make_response(jsonify({"message" : "sorry, you cannot modify an order past 10PM"}), 200)
 
 
     def delete(self, order_id):

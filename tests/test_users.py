@@ -193,8 +193,7 @@ class UserTests(unittest.TestCase):
                            "password" : "secret"})
         response = self.app.post('/api/v1/auth/signup', data=data, content_type='application/json')
         result = json.loads(response.data)
-        self.assertEqual(result.get("message"), {"confirm_password": """kindly provide a valid
-                                                 confirmation password"""})
+        self.assertEqual(result.get("message"), {"confirm_password": "kindly provide a valid confirmation password"})
 
     def test_successfully_getting_user(self):
         """Test getting one user using the user's id"""

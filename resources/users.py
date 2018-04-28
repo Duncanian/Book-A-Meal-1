@@ -88,10 +88,8 @@ class Login(Resource):
         for user_id in data.all_users:
             if data.all_users.get(user_id)["email"] == kwargs.get('email') and \
                 data.all_users.get(user_id)["password"] == kwargs.get('password'):
-                return make_response(jsonify({"message" : """you have been
-                                              successfully logged in"""}), 200)
-            return make_response(jsonify({"message" : """invalid email
-                                          address or password"""}), 401) # deliberately ambigous
+                return make_response(jsonify({"message" : "you have been successfully logged in"}), 200)
+            return make_response(jsonify({"message" : "invalid email address or password"}), 401)
 
 
 
