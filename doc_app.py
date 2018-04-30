@@ -319,6 +319,10 @@ def delete_order():
         required: true
     """
 
+@app.route('/')
+def hello_world():
+    "test that flask app is running"
+    return "To view the docs visit: https://book-a-meal-api.herokuapp.com/apidocs"
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))

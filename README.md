@@ -113,7 +113,7 @@ https://lennykioko.github.io/
 
 ## Heroku
 
-https://book-a-meal-api.herokuapp.com/
+https://book-a-meal-api.herokuapp.com/apidocs
 
 ## Versioning
 
