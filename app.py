@@ -7,6 +7,7 @@ from flask import Flask
 from resources.meals import meals_api
 from resources.users import users_api
 
+
 def create_app():
     """Create flask app"""
     app = Flask(__name__)
@@ -19,6 +20,7 @@ def create_app():
     return app
 
 app = create_app()
+
 
 @app.route('/')
 def hello_world():
