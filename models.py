@@ -201,7 +201,7 @@ class Menu(db.Model):
         if not menu:
             return make_response(jsonify({"message" : "menu option does not exists"}), 404)
 
-        by_name = cls.query.filter_by(menu_option=menu_option).first()
+        by_name = Menu.query.filter_by(menu_option=menu_option).first()
         if by_name is None:
             menu.menu_option = menu_option
             menu.price = price
