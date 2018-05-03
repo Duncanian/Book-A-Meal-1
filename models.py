@@ -1,144 +1,309 @@
-"""Handles data storage for Users, Meals and Orders
+"""Handles data storage for Users, Meals, Menu and Orders
 """
+# pylint: disable=E1101
+import datetime
 
-all_users = {}
-user_count = 1
+from flask import make_response, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_sqlalchemy import SQLAlchemy
 
-all_meals = {}
-meal_count = 1
-
-all_menu = {}
-menu_count = 1
-
-all_orders = {}
-order_count = 1
+db = SQLAlchemy()
 
 
-class User(object):
-    """Contains methods to add, update and delete a user"""
+class User(db.Model):
+    """Contains user columns and methods to add, update and delete a user"""
+
+
+    __tablename__ = 'users'
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(250), nullable=False)
+    email = db.Column(db.String(250), unique=True, nullable=False)
+    password = db.Column(db.String(250), nullable=False)
+    admin = db.Column(db.Boolean)
+
+    def __repr__(self):
+        return '<user {}>'.format(self.username)
+
+
+    @classmethod
+    def create_user(cls, username, email, password, admin=False):
+        """Creates a new user and ensures that the email is unique"""
+
+        by_email = cls.query.filter_by(email=email).first()
+
+        if by_email is None:
+            password = generate_password_hash(password, method='sha256')
+            new_user = cls(username=username, email=email, password=password, admin=admin)
+            db.session.add(new_user)
+            db.session.commit()
+            return make_response(jsonify({
+                "message" : "user has been successfully created",
+                str(new_user.id) : {"username" : new_user.username,
+                "email" : new_user.email,
+                "password" : new_user.password,
+                "admin" : new_user.admin}}), 201)
+
+
+        return make_response(jsonify({"message" : "user with that email already exists"}), 400)
 
 
     @staticmethod
-    def create_user(username, email, password, admin=False, **kwargs):
-        """Creates a new user and appends his information to the all_users dictionary"""
-        global all_users
-        global user_count
-        all_users[user_count] = {"id": user_count, "username" : username,
-                                 "email" : email, "password" : password, "admin" : admin}
-        new_user = all_users[user_count]
-        user_count += 1
-        return new_user
-
-    @staticmethod
-    def update_user(user_id, username, email, password, admin=False, **kwargs):
+    def update_user(user_id, username, email, password, admin=False):
         """Updates user information"""
-        if user_id in all_users.keys():
-            all_users[user_id] = {"id" : user_id, "username" : username, "email" : email,
-                                  "password" : password, "admin" : admin}
-            return all_users[user_id]
-        return {"message" : "user does not exist"}
+        user = User.query.get(user_id)
+        
+        if not user:
+            return make_response(jsonify({"message" : "user does not exists"}), 404)
+        user.username = username
+        user.email = email
+        user.password = generate_password_hash(password, method='sha256')
+        user.admin = admin
+        db.session.commit()
+        return make_response(jsonify({
+            "message" : "user has been successfully updated",
+            str(user.id) : {"username" : user.username,
+            "email" : user.email,
+            "password" : user.password,
+            "admin" : user.admin}}), 200)
+
 
     @staticmethod
     def delete_user(user_id):
         """Deletes a user"""
-        try:
-            del all_users[user_id]
-            return {"message" : "user successfully deleted"}
-        except KeyError:
-            return {"message" : "user does not exist"}
-
-
-class Meal(object):
-    """Contains methods to add, update and delete a meal item"""
+        user = User.query.get(user_id)
+        
+        if not user:
+            return make_response(jsonify({"message" : "user does not exists"}), 404)
+        
+        db.session.delete(user)
+        db.session.commit()
+        return make_response(jsonify({"message" : "user has been successfully deleted"}), 200)
 
 
     @staticmethod
-    def create_meal(meal_item, price, **kwargs):
-        """Creates a new meal item and appends this information to the all_meals dictionary"""
-        global all_meals
-        global meal_count
-        all_meals[meal_count] = {"id": meal_count, "meal_item" : meal_item, "price": price}
-        new_meal = all_meals[meal_count]
-        meal_count += 1
-        return new_meal
+    def get_user(user_id):
+        """Gets a particular user"""
+        user = User.query.get(user_id)
+        
+        if not user:
+            return make_response(jsonify({"message" : "user does not exists"}), 404)
+        
+        info = {"user_id" : user.id, "email" : user.email,
+                "username" : user.username, "password" : user.password,
+                "admin" : user.admin}
+
+        return make_response(jsonify({user.id : info}), 200)
+
+
+class Meal(db.Model):
+    """Contains meal columns and methods to add, update and delete a meal item"""
+
+
+    __tablename__ = 'meals'
+    id = db.Column(db.Integer, primary_key=True)
+    meal_item = db.Column(db.String(250), nullable=False, unique=True)
+    price = db.Column(db.Integer, nullable=False)
+    
+
+    def __repr__(self):
+        return '<meal {}>'.format(self.meal_item)
+
+
+    @classmethod
+    def create_meal(cls, meal_item, price):
+        """Creates a new meal item and ensures that the name is unique"""
+        by_name = cls.query.filter_by(meal_item=meal_item).first()
+
+        if by_name is None:
+            new_meal = cls(meal_item=meal_item, price=price)
+            print(new_meal)
+            db.session.add(new_meal)
+            db.session.commit()
+            return make_response(jsonify({
+                "message" : "meal item has been successfully created",
+                str(new_meal.id) : {"meal_item" : new_meal.meal_item,
+                "price" : new_meal.price}}), 201)
+
+        return make_response(jsonify({"message" : "meal item with that name already exists"}), 400)
 
     @staticmethod
-    def update_meal(meal_id, meal_item, price, **kwargs):
+    def update_meal(meal_id, meal_item, price):
         """Updates meal item information"""
-        if meal_id in all_meals.keys():
-            all_meals[meal_id] = {"id": meal_id, "meal_item" : meal_item, "price" : price}
-            return all_meals[meal_id]
-        return {"message" : "meal item does not exist"}
+        meal = Meal.query.get(meal_id)
+        
+        if not meal:
+            return make_response(jsonify({"message" : "meal does not exists"}), 404)
+        meal.meal_item = meal_item
+        meal.price = price
+        db.session.commit()
+        return make_response(jsonify({
+            "message" : "meal has been successfully updated",
+            str(meal.id) : {"meal_item" : meal.meal_item,
+            "price" : meal.price}}), 200)
 
     @staticmethod
     def delete_meal(meal_id):
         """Deletes a meal"""
-        try:
-            del all_meals[meal_id]
-            return {"message" : "meal item successfully deleted"}
-        except KeyError:
-            return {"message" : "meal item does not exist"}
+        meal = Meal.query.get(meal_id)
+        
+        if not meal:
+            return make_response(jsonify({"message" : "meal does not exists"}), 404)
+        
+        db.session.delete(meal)
+        db.session.commit()
+        return make_response(jsonify({"message" : "meal has been successfully deleted"}), 200)
+    
+    @staticmethod
+    def get_meal(meal_id):
+        """Gets a particular meal item"""
+        meal = Meal.query.get(meal_id)
+        
+        if not meal:
+            return make_response(jsonify({"message" : "meal does not exists"}), 404)
+        
+        info = {"id" : meal.id, "meal_item" : meal.meal_item, "price" : meal.price}
+        return make_response(jsonify({meal.id : info}), 200)
 
 
-class Menu(object):
-    """Contains methods to add, update and delete a menu options"""
+class Menu(db.Model):
+    """Contains menu columns and methods to add, update and delete a menu option"""
+    __tablename__ = 'menu'
+    id = db.Column(db.Integer, primary_key=True)
+    menu_option = db.Column(db.String(50), nullable=False, unique=True)
+    price = db.Column(db.Integer, nullable=False)
+    
 
+    def __repr__(self):
+        return '<menu option {}>'.format(self.menu_option)
+
+
+    @classmethod
+    def create_menu(cls, menu_option, price):
+        """Creates a new menu option and ensures that the name is unique"""
+        by_name = cls.query.filter_by(menu_option=menu_option).first()
+
+        if by_name is None:
+            new_menu = cls(menu_option=menu_option, price=price)
+            db.session.add(new_menu)
+            db.session.commit()
+            return make_response(jsonify({
+                "message" : "menu option has been successfully created",
+                str(new_menu.id) : {"menu_option" : new_menu.menu_option,
+                "price" : new_menu.price}}), 201)
+
+        return make_response(jsonify({"message" : "menu option with that name already exists"}), 400)
 
     @staticmethod
-    def create_menu(menu_option, price, **kwargs):
-        """Creates a new menu option and appends this information to the all_menu dictionary"""
-        global all_menu
-        global menu_count
-        all_menu[menu_count] = {"id": menu_count, "menu_option" : menu_option, "price": price}
-        new_menu_option = all_menu[menu_count]
-        menu_count += 1
-        return new_menu_option
+    def update_menu(menu_id, menu_option, price):
+        """Updates menu option information"""
+        menu = Menu.query.get(menu_id)
+        
+        if not menu:
+            return make_response(jsonify({"message" : "menu option does not exists"}), 404)
 
-    @staticmethod
-    def update_menu(menu_id, menu_option, price, **kwargs):
-        """Updates menu option information in menu"""
-        if menu_id in all_menu.keys():
-            all_menu[menu_id] = {"id": menu_id, "menu_option" : menu_option, "price" : price}
-            return all_menu[menu_id]
-        return {"message" : "menu option does not exist"}
+        by_name = cls.query.filter_by(menu_option=menu_option).first()
+        if by_name is None:
+            menu.menu_option = menu_option
+            menu.price = price
+            db.session.commit()
+            return make_response(jsonify({
+                "message" : "menu option has been successfully updated",
+                str(menu.id) : {"menu_option" : menu.menu_option,
+                "price" : menu.price}}), 200)
+
+        return make_response(jsonify({"message" : "menu option with that name already exists"}), 400)
 
     @staticmethod
     def delete_menu(menu_id):
-        """Deletes a menu_option from the menu"""
-        try:
-            del all_menu[menu_id]
-            return {"message" : "menu option successfully deleted"}
-        except KeyError:
-            return {"message" : "menu option does not exist"}
+        """Deletes a meal"""
+        menu = Menu.query.get(menu_id)
+        
+        if not menu:
+            return make_response(jsonify({"message" : "menu option does not exists"}), 404)
+        
+        db.session.delete(menu)
+        db.session.commit()
+        return make_response(jsonify({"message" : "menu option has been successfully deleted"}), 200)
+    
+    @staticmethod
+    def get_menu(menu_id):
+        """Gets a particular menu option"""
+        menu = Menu.query.get(menu_id)
+        
+        if not menu:
+            return make_response(jsonify({"message" : "menu option does not exists"}), 404)
+        
+        info = {"menu_id" : menu.id, "menu_option" : menu.menu_option, "price" : menu.price}
+        return make_response(jsonify({menu.id : info}), 200)
 
 
-class Order(object):
-    """Contains methods to add, update and delete orders"""
+class Order(db.Model):
+    """Contains order columns and methods to add, update and delete an order item"""
+    __tablename__ = 'orders'
+    id = db.Column(db.Integer, primary_key=True)
+    order_item = db.Column(db.String(250), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    client_id = db.Column(db.Integer, nullable=False)
+    client_email = db.Column(db.String(250), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    
 
+    def __repr__(self):
+        return '<order {}>'.format(self.order_item)
+
+
+    @classmethod
+    def create_order(cls, order_item, price, client_id, client_email):
+        """Creates a new order item"""
+        
+        new_order = cls(order_item=order_item, price=price, client_id=client_id, client_email=client_email)
+        db.session.add(new_order)
+        db.session.commit()
+        return make_response(jsonify({
+            "message" : "order has been successfully created",
+            str(new_order.id) : {"order_item" : new_order.order_item,
+            "price" : new_order.price, "client_id" : new_order.client_id,
+            "client_email" : new_order.client_email,
+            "created_at" : new_order.created_at}}), 201)
+
+        
 
     @staticmethod
-    def create_order(order_item, price, **kwargs):
-        """Creates a new order and appends this information to the all_orders dictionary"""
-        global all_orders
-        global order_count
-        all_orders[order_count] = {"id": order_count, "order_item" : order_item, "price": price}
-        new_order = all_orders[order_count]
-        order_count += 1
-        return new_order
-
-    @staticmethod
-    def update_order(order_id, order_item, price, **kwargs):
-        """Updates order information"""
-        if order_id in all_orders.keys():
-            all_orders[order_id] = {"id": order_id, "order_item" : order_item, "price" : price}
-            return all_orders[order_id]
-        return {"message" : "order item does not exist"}
+    def update_order(order_id, order_item, price):
+        """Updates order item information"""
+        order = Order.query.get(order_id)
+        
+        if order is None:
+            return make_response(jsonify({"message" : "order does not exists"}), 404)
+        order.order_item = order_item
+        order.price = price
+        db.session.commit()
+        return make_response(jsonify({
+            "message" : "order has been successfully updated",
+            str(order.id) : {"order_item" : order.order_item,
+            "price" : order.price}}), 200)
 
     @staticmethod
     def delete_order(order_id):
-        """Deletes a order"""
-        try:
-            del all_orders[order_id]
-            return {"message" : "order item successfully deleted"}
-        except KeyError:
-            return {"message" : "order item does not exist"}
+        """Deletes an order"""
+        order = Order.query.get(order_id)
+        
+        if order is None:
+            return make_response(jsonify({"message" : "order does not exists"}), 404)
+        
+        db.session.delete(order)
+        db.session.commit()
+        return make_response(jsonify({"message" : "order has been successfully deleted"}), 200)
+    
+    @staticmethod
+    def get_order(order_id):
+        """Gets a particular order item"""
+        order = Order.query.get(order_id)
+        
+        if order is None:
+            return make_response(jsonify({"message" : "order item does not exists"}), 404)
+        
+        info = {"order_id" : order.id, "order_item" : order.order_item, "price" : order.price,
+                "client_id" : order.client_id, "client_email" : order.client_email,
+                "created_at" : order.created_at}
+        return make_response(jsonify({order.id : info}), 200)
