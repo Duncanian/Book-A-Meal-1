@@ -2,11 +2,34 @@
 """
 import datetime
 
-from flask import jsonify, Blueprint, make_response
-from flask_restful import Resource, Api, reqparse, inputs
+from flask import jsonify, Blueprint, make_response, request
+from flask_restful import Resource, Api, reqparse, inputs, fields, marshal
+import jwt
 
-import models as data
+import models
+import config
+from .auth import token_required, admin_required
 
+meal_fields = {
+    'id' : fields.Integer,
+    'meal_item': fields.String,
+    'price': fields.Integer,
+}
+
+menu_fields = {
+    'id' : fields.Integer,
+    'menu_option': fields.String,
+    'price': fields.Integer,
+}
+
+order_fields = {
+    'id' : fields.Integer,
+    'order_item': fields.String,
+    'price': fields.Integer,
+    'client_id' : fields.Integer,
+    'client_email' : fields.String,
+    'created_at' : fields.DateTime
+}
 
 class MealList(Resource):
     """Contains GET and POST methods"""
@@ -23,24 +46,25 @@ class MealList(Resource):
         self.reqparse.add_argument(
             'price',
             required=True,
-            type=float,
+            type=int,
             help='kindly provide a price(should be a valid number)',
             location=['form', 'json'])
         super().__init__()
 
+    @admin_required
     def post(self):
         """Adds a new meal item"""
         kwargs = self.reqparse.parse_args()
-        for meal_id in data.all_meals:
-            if data.all_meals.get(meal_id)["meal_item"] == kwargs.get('meal_item'):
-                return jsonify({"message" : "meal item with that name already exists"})
+        response = models.Meal.create_meal(
+            meal_item=kwargs.get('meal_item'),
+            price=kwargs.get('price'))
+        return response
 
-        result = data.Meal.create_meal(**kwargs)
-        return make_response(jsonify(result), 201)
-
+    @admin_required
     def get(self):
         """Gets all meal items"""
-        return make_response(jsonify(data.all_meals), 200)
+        meals = [marshal(meal, meal_fields) for meal in models.Meal.query.order_by(models.Meal.id.desc()).all()]  
+        return make_response(jsonify({'meals': meals}), 200)
 
 
 class Meal(Resource):
@@ -58,33 +82,32 @@ class Meal(Resource):
         self.reqparse.add_argument(
             'price',
             required=True,
-            type=float,
+            type=int,
             help='kindly provide a price(should be a valid number)',
             location=['form', 'json'])
         super().__init__()
 
+    @admin_required
     def get(self, meal_id):
         """Get a particular meal"""
-        try:
-            meal = data.all_meals[meal_id]
-            return make_response(jsonify(meal), 200)
-        except KeyError:
-            return make_response(jsonify({"message" : "meal item does not exist"}), 404)
+        response = models.Meal.get_meal(meal_id)
+        return response
 
+    @admin_required
     def put(self, meal_id):
         """Update a particular meal"""
         kwargs = self.reqparse.parse_args()
-        result = data.Meal.update_meal(meal_id, **kwargs)
-        if result != {"message" : "meal item does not exist"}:
-            return make_response(jsonify(result), 200)
-        return make_response(jsonify(result), 404)
+        response = models.Meal.update_meal(
+            meal_id=meal_id,
+            meal_item=kwargs.get('meal_item'),
+            price=kwargs.get('price'))
+        return response
 
+    @admin_required
     def delete(self, meal_id):
         """Delete a particular meal"""
-        result = data.Meal.delete_meal(meal_id)
-        if result != {"message" : "meal item does not exist"}:
-            return make_response(jsonify(result), 200)
-        return make_response(jsonify(result), 404)
+        response = models.Meal.delete_meal(meal_id)
+        return response
 
 class MenuList(Resource):
     """Contains GET and POST methods for manipulating menu data"""
@@ -101,25 +124,25 @@ class MenuList(Resource):
         self.reqparse.add_argument(
             'price',
             required=True,
-            type=float,
+            type=int,
             help='kindly provide a price(should be a valid number)',
             location=['form', 'json'])
         super().__init__()
 
+    @admin_required
     def post(self):
-        """Adds a meal option to the menu"""
+        """Adds a menu option to the menu"""
         kwargs = self.reqparse.parse_args()
-        for menu_id in data.all_menu:
-            if data.all_menu.get(menu_id)["menu_option"] == kwargs.get('menu_option'):
-                return jsonify({"message" : "menu option with that name already exists"})
+        response = models.Menu.create_menu(
+            menu_option=kwargs.get('menu_option'),
+            price=kwargs.get('price'))
+        return response
 
-        result = data.Menu.create_menu(**kwargs)
-        return make_response(jsonify(result), 201)
-
-
+    @token_required
     def get(self):
         """Gets all menu options on the menu"""
-        return make_response(jsonify(data.all_menu), 200)
+        menus = [marshal(menu, menu_fields) for menu in models.Menu.query.order_by(models.Menu.id.desc()).all()]  
+        return make_response(jsonify({'menu': menus}), 200)
 
 
 class Menu(Resource):
@@ -137,33 +160,32 @@ class Menu(Resource):
         self.reqparse.add_argument(
             'price',
             required=True,
-            type=float,
+            type=int,
             help='kindly provide a price(should be a valid number)',
             location=['form', 'json'])
         super().__init__()
 
+    @token_required
     def get(self, menu_id):
-        """Get a particular menu_option"""
-        try:
-            meal = data.all_menu[menu_id]
-            return make_response(jsonify(meal), 200)
-        except KeyError:
-            return make_response(jsonify({"message" : "menu option does not exist"}), 404)
+        """Get a particular menu option"""
+        response = models.Menu.get_menu(menu_id)
+        return response
 
+    @admin_required
     def put(self, menu_id):
         """Update a particular menu option"""
         kwargs = self.reqparse.parse_args()
-        result = data.Menu.update_menu(menu_id, **kwargs)
-        if result != {"message" : "menu option does not exist"}:
-            return make_response(jsonify(result), 200)
-        return make_response(jsonify(result), 404)
+        response = models.Menu.update_menu(
+            menu_id=menu_id,
+            menu_option=kwargs.get('menu_option'),
+            price=kwargs.get('price'))
+        return response
 
+    @admin_required
     def delete(self, menu_id):
         """Delete a particular menu option"""
-        result = data.Menu.delete_menu(menu_id)
-        if result != {"message" : "menu option does not exist"}:
-            return make_response(jsonify(result), 200)
-        return make_response(jsonify(result), 404)
+        response = models.Menu.delete_menu(menu_id)
+        return response
 
 
 class OrderList(Resource):
@@ -171,8 +193,8 @@ class OrderList(Resource):
 
 
     def __init__(self):
-        self.now = datetime.time(10, 0, 0) # timer
-        self.closing = datetime.time(15, 0, 0)
+        self.now = datetime.datetime.utcnow() # timer
+        self.closing = datetime.time(23, 0, 0)
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'order_item',
@@ -183,23 +205,33 @@ class OrderList(Resource):
         self.reqparse.add_argument(
             'price',
             required=True,
-            type=float,
+            type=int,
             help='kindly provide a price(should be a valid number)',
             location=['form', 'json'])
         super().__init__()
 
+    @token_required
     def post(self):
         """Creates a new order"""
         kwargs = self.reqparse.parse_args()
         if self.now.hour < self.closing.hour:
-            result = data.Order.create_order(**kwargs)
-            return make_response(jsonify(result), 201)
-        return make_response(jsonify({"message" : "sorry, you cannot make an order past 10PM"}), 200)
-
-
+            token = request.headers['x-access-token']
+            data = jwt.decode(token, config.Config.SECRET_KEY)
+            user_id = data['id']
+            client = models.User.query.get(user_id)
+            response = models.Order.create_order(
+                order_item=kwargs.get('order_item'),
+                price=kwargs.get('price'),
+                client_id=client.id,
+                client_email=client.email)
+            return response
+        return make_response(jsonify({"message" : "sorry, we do not take orders past 11PM"}), 200)
+    
+    @admin_required
     def get(self):
         """Gets all orders"""
-        return make_response(jsonify(data.all_orders), 200)
+        orders = [marshal(order, order_fields) for order in models.Order.query.order_by(models.Order.id.desc()).all()]  
+        return make_response(jsonify({'orders': orders}), 200)
 
 
 class Order(Resource):
@@ -207,8 +239,8 @@ class Order(Resource):
 
 
     def __init__(self):
-        self.now = datetime.time(10, 0, 0) # timer
-        self.closing = datetime.time(15, 0, 0)
+        self.now = datetime.datetime.utcnow() # timer
+        self.closing = datetime.time(23, 0, 0)
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'order_item',
@@ -219,36 +251,32 @@ class Order(Resource):
         self.reqparse.add_argument(
             'price',
             required=True,
-            type=float,
+            type=int,
             help='kindly provide a price(should be a valid number)',
             location=['form', 'json'])
         super().__init__()
 
+    @token_required
     def get(self, order_id):
         """Get a particular order"""
-        try:
-            order = data.all_orders[order_id]
-            return make_response(jsonify(order), 200)
-        except KeyError:
-            return make_response(jsonify({"message" : "order item does not exist"}), 404)
+        response = models.Order.get_order(order_id)
+        return response
 
+    @token_required
     def put(self, order_id):
         """Update a particular order"""
-        kwargs = self.reqparse.parse_args()
         if self.now.hour < self.closing.hour:
-            result = data.Order.update_order(order_id, **kwargs)
-            if result != {"message" : "order item does not exist"}:
-                return make_response(jsonify(result), 200)
-            return make_response(jsonify(result), 404)
-        return make_response(jsonify({"message" : "sorry, you cannot modify an order past 10PM"}), 200)
+            kwargs = self.reqparse.parse_args()
+            response = models.Order.update_order(order_id, **kwargs)
+            return response
+        return make_response(jsonify({"message" : "sorry, we do not take orders past 11PM"}), 200)
+        
 
-
+    @token_required
     def delete(self, order_id):
         """Delete a particular order"""
-        result = data.Order.delete_order(order_id)
-        if result != {"message" : "order item does not exist"}:
-            return make_response(jsonify(result), 200)
-        return make_response(jsonify(result), 404)
+        response = models.Order.delete_order(order_id)
+        return response
 
 
 meals_api = Blueprint('resources.meals', __name__)

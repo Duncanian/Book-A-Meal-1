@@ -1,10 +1,24 @@
 """Contains all endpoints to manipulate user information
 """
-
 from flask import Blueprint, jsonify, make_response
-from flask_restful import Resource, Api, reqparse, inputs
+from flask_restful import Resource, Api, reqparse, inputs, marshal, fields
+from werkzeug.security import check_password_hash
+import datetime
+import jwt
 
-import models as data
+import models
+import config
+from .auth import token_required, admin_required
+
+
+user_fields = {
+    'id' : fields.Integer,
+    'username': fields.String,
+    'email': fields.String,
+    'password': fields.String,
+    'admin': fields.Boolean
+}
+
 
 class Signup(Resource):
     "Contains a POST method to register a new user"
@@ -50,16 +64,17 @@ class Signup(Resource):
     def post(self):
         """Register a new user"""
         kwargs = self.reqparse.parse_args()
-        for user_id in data.all_users:
-            if data.all_users.get(user_id)["email"] == kwargs.get('email'):
-                return jsonify({"message" : "user with that email already exists"})
-
         if kwargs.get('password') == kwargs.get('confirm_password'):
             if len(kwargs.get('password')) >= 8:
-                result = data.User.create_user(**kwargs)
-                return make_response(jsonify(result), 201)
-            return jsonify({"message" : "password should be at least 8 characters"})
-        return jsonify({"message" : "password and confirm password should be identical"})
+                response = models.User.create_user(
+                    username=kwargs.get('username'),
+                    email=kwargs.get('email'),
+                    password=kwargs.get('password'),
+                    admin=kwargs.get('admin'))
+
+                return response
+            return make_response(jsonify({"message" : "password should be at least 8 characters"}), 400)
+        return make_response(jsonify({"message" : "password and confirm password should be identical"}), 400)
 
 class Login(Resource):
     "Contains a POST method to login a user"
@@ -85,11 +100,24 @@ class Login(Resource):
     def post(self):
         """login a user"""
         kwargs = self.reqparse.parse_args()
-        for user_id in data.all_users:
-            if data.all_users.get(user_id)["email"] == kwargs.get('email') and \
-                data.all_users.get(user_id)["password"] == kwargs.get('password'):
-                return make_response(jsonify({"message" : "you have been successfully logged in"}), 200)
+        email = kwargs.get('email')
+        password = kwargs.get('password')
+        user = models.User.query.filter_by(email=email).first()
+
+        if user is None: # deliberately ambigous
             return make_response(jsonify({"message" : "invalid email address or password"}), 401)
+
+        if check_password_hash(user.password, password):
+            token = jwt.encode({
+                'id' : user.id,
+                'admin' : user.admin,
+                'exp' : datetime.datetime.utcnow() + datetime.timedelta(weeks=2)},
+                config.Config.SECRET_KEY)
+
+            return make_response(jsonify({"message" : "you have been successfully logged in",
+                                          "token" : token.decode('UTF-8')}), 200)
+        
+        return make_response(jsonify({"message" : "invalid email address or password"}), 401)
 
 
 
@@ -134,24 +162,28 @@ class UserList(Resource):
             location=['form', 'json'])
         super().__init__()
 
+
     def post(self):
         """Register a new user"""
         kwargs = self.reqparse.parse_args()
-        for user_id in data.all_users:
-            if data.all_users.get(user_id)["email"] == kwargs.get('email'):
-                return jsonify({"message" : "user with that email already exists"})
-
         if kwargs.get('password') == kwargs.get('confirm_password'):
             if len(kwargs.get('password')) >= 8:
-                result = data.User.create_user(**kwargs)
-                return make_response(jsonify(result), 201)
-            return jsonify({"message" : "password should be at least 8 characters"})
-        return jsonify({"message" : "password and confirm password should be identical"})
+                response = models.User.create_user(
+                    username=kwargs.get('username'),
+                    email=kwargs.get('email'),
+                    password=kwargs.get('password'),
+                    admin=kwargs.get('admin'))
 
+                return response
+            return make_response(jsonify({"message" : "password should be at least 8 characters"}), 400)
+        return make_response(jsonify({"message" : "password and confirm password should be identical"}), 400)
+
+    @admin_required
     def get(self):
         """Get all users"""
-        return make_response(jsonify(data.all_users), 200)
-
+        users = [marshal(user, user_fields) for user in models.User.query.order_by(models.User.id.desc()).all()]  
+        return make_response(jsonify({'users': users}), 200)
+    
 
 class User(Resource):
     """Contains GET PUT and DELETE methods for interacting with a particular user"""
@@ -194,28 +226,35 @@ class User(Resource):
             location=['form', 'json'])
         super().__init__()
 
+    @admin_required
     def get(self, user_id):
         """Get a particular user"""
-        try:
-            user = data.all_users[user_id]
-            return make_response(jsonify(user), 200)
-        except KeyError:
-            return make_response(jsonify({"message" : "user does not exist"}), 404)
+        response = models.User.get_user(user_id)
+        return response
 
+    @admin_required
     def put(self, user_id):
         """Update a particular user"""
         kwargs = self.reqparse.parse_args()
-        result = data.User.update_user(user_id, **kwargs)
-        if result != {"message" : "user does not exist"}:
-            return make_response(jsonify(result), 200)
-        return make_response(jsonify(result), 404)
+        if kwargs.get('password') == kwargs.get('confirm_password'):
+            if len(kwargs.get('password')) >= 8:
+                response = models.User.update_user(
+                    user_id=user_id,
+                    username=kwargs.get('username'),
+                    email=kwargs.get('email'),
+                    password=kwargs.get('password'),
+                    admin=kwargs.get('admin'))
+                return response
 
+            return make_response(jsonify({"message" : "password should be at least 8 characters"}), 400)
+        return make_response(jsonify({"message" : "password and confirm password should be identical"}), 400)
+            
+
+    @admin_required
     def delete(self, user_id):
         """Delete a particular user"""
-        result = data.User.delete_user(user_id)
-        if result != {"message" : "user does not exist"}:
-            return make_response(jsonify(result), 200)
-        return make_response(jsonify(result), 404)
+        response = models.User.delete_user(user_id)
+        return response
 
 
 
