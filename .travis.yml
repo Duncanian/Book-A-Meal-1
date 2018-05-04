@@ -8,6 +8,9 @@ install:
   - pip install coveralls
 script:
   - python -m pytest --cov-report term-missing --cov=resources
+before_script:
+  - source ./.travis.sh
+  - psql -c 'create database travis_tests;' -U postgres
 after_success:
   - coveralls
 notifications:
