@@ -1,9 +1,10 @@
 """Contains all endpoints to manipulate user information
 """
+import datetime
+
 from flask import Blueprint, jsonify, make_response
 from flask_restful import Resource, Api, reqparse, inputs, marshal, fields
 from werkzeug.security import check_password_hash
-import datetime
 import jwt
 
 import models
@@ -25,7 +26,7 @@ class Signup(Resource):
 
 
     def __init__(self):
-        "Validates input from the form as well as json input"
+        """Validates both json and form-data input"""
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'username',
@@ -57,9 +58,11 @@ class Signup(Resource):
             required=False,
             nullable=True,
             default=False,
+            help='kindly provide a valid boolean value',
             type=bool,
             location=['form', 'json'])
         super().__init__()
+
 
     def post(self):
         """Register a new user"""
@@ -70,18 +73,19 @@ class Signup(Resource):
                     username=kwargs.get('username'),
                     email=kwargs.get('email'),
                     password=kwargs.get('password'),
-                    admin=kwargs.get('admin'))
+                    admin=False) # you cannot create an admin user through the signup endpoint
 
                 return response
             return make_response(jsonify({"message" : "password should be at least 8 characters"}), 400)
         return make_response(jsonify({"message" : "password and confirm password should be identical"}), 400)
+
 
 class Login(Resource):
     "Contains a POST method to login a user"
 
 
     def __init__(self):
-        "Validates input from the form as well as json input"
+        """Validates both json and form-data input"""
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'email',
@@ -97,15 +101,16 @@ class Login(Resource):
             location=['form', 'json'])
         super().__init__()
 
+
     def post(self):
-        """login a user"""
+        """login a user by providing a token"""
         kwargs = self.reqparse.parse_args()
         email = kwargs.get('email')
         password = kwargs.get('password')
         user = models.User.query.filter_by(email=email).first()
 
         if user is None: # deliberately ambigous
-            return make_response(jsonify({"message" : "invalid email address or password"}), 401)
+            return make_response(jsonify({"message" : "invalid email address or password"}), 400)
 
         if check_password_hash(user.password, password):
             token = jwt.encode({
@@ -117,7 +122,7 @@ class Login(Resource):
             return make_response(jsonify({"message" : "you have been successfully logged in",
                                           "token" : token.decode('UTF-8')}), 200)
         
-        return make_response(jsonify({"message" : "invalid email address or password"}), 401)
+        return make_response(jsonify({"message" : "invalid email address or password"}), 400)
 
 
 
@@ -126,7 +131,7 @@ class UserList(Resource):
 
 
     def __init__(self):
-        "Validates input from the form as well as json input"
+        """Validates both json and form-data input"""
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'username',
@@ -158,13 +163,14 @@ class UserList(Resource):
             required=False,
             nullable=True,
             default=False,
+            help='kindly provide a valid boolean value',
             type=bool,
             location=['form', 'json'])
         super().__init__()
 
-
+    @admin_required
     def post(self):
-        """Register a new user"""
+        """Create a new user who can have admin privilege"""
         kwargs = self.reqparse.parse_args()
         if kwargs.get('password') == kwargs.get('confirm_password'):
             if len(kwargs.get('password')) >= 8:
@@ -190,7 +196,7 @@ class User(Resource):
 
 
     def __init__(self):
-        "Validates input from the form as well as json input"
+        """Validates both json and form-data input"""
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'username',
@@ -222,6 +228,7 @@ class User(Resource):
             required=False,
             nullable=True,
             default=False,
+            help='kindly provide a valid boolean value',
             type=bool,
             location=['form', 'json'])
         super().__init__()

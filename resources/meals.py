@@ -31,8 +31,9 @@ order_fields = {
     'created_at' : fields.DateTime
 }
 
+
 class MealList(Resource):
-    """Contains GET and POST methods"""
+    """Contains GET and POST methods for manipulating meal information"""
 
 
     def __init__(self):

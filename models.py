@@ -116,7 +116,6 @@ class Meal(db.Model):
 
         if by_name is None:
             new_meal = cls(meal_item=meal_item, price=price)
-            print(new_meal)
             db.session.add(new_meal)
             db.session.commit()
             return make_response(jsonify({
@@ -169,7 +168,7 @@ class Menu(db.Model):
     """Contains menu columns and methods to add, update and delete a menu option"""
     __tablename__ = 'menu'
     id = db.Column(db.Integer, primary_key=True)
-    menu_option = db.Column(db.String(50), nullable=False, unique=True)
+    menu_option = db.Column(db.String(250), nullable=False, unique=True)
     price = db.Column(db.Integer, nullable=False)
     
 
@@ -198,27 +197,24 @@ class Menu(db.Model):
         """Updates menu option information"""
         menu = Menu.query.get(menu_id)
         
-        if not menu:
+        if menu is None:
             return make_response(jsonify({"message" : "menu option does not exists"}), 404)
 
-        by_name = Menu.query.filter_by(menu_option=menu_option).first()
-        if by_name is None:
-            menu.menu_option = menu_option
-            menu.price = price
-            db.session.commit()
-            return make_response(jsonify({
-                "message" : "menu option has been successfully updated",
-                str(menu.id) : {"menu_option" : menu.menu_option,
-                "price" : menu.price}}), 200)
+        menu.menu_option = menu_option
+        menu.price = price
+        db.session.commit()
+        return make_response(jsonify({
+            "message" : "menu option has been successfully updated",
+            str(menu.id) : {"menu_option" : menu.menu_option,
+            "price" : menu.price}}), 200)
 
-        return make_response(jsonify({"message" : "menu option with that name already exists"}), 400)
 
     @staticmethod
     def delete_menu(menu_id):
         """Deletes a meal"""
         menu = Menu.query.get(menu_id)
         
-        if not menu:
+        if menu is None:
             return make_response(jsonify({"message" : "menu option does not exists"}), 404)
         
         db.session.delete(menu)
@@ -230,7 +226,7 @@ class Menu(db.Model):
         """Gets a particular menu option"""
         menu = Menu.query.get(menu_id)
         
-        if not menu:
+        if menu is None:
             return make_response(jsonify({"message" : "menu option does not exists"}), 404)
         
         info = {"menu_id" : menu.id, "menu_option" : menu.menu_option, "price" : menu.price}
@@ -264,9 +260,7 @@ class Order(db.Model):
             str(new_order.id) : {"order_item" : new_order.order_item,
             "price" : new_order.price, "client_id" : new_order.client_id,
             "client_email" : new_order.client_email,
-            "created_at" : new_order.created_at}}), 201)
-
-        
+            "created_at" : new_order.created_at}}), 200) # match status code of time limit
 
     @staticmethod
     def update_order(order_id, order_item, price):
