@@ -58,7 +58,7 @@ Endpoint | Functionality
 ------------ | -------------
 POST   /api/v1/auth/signup | Register a user
 POST   /api/v1/auth/login | Log in user
-POST   /api/v1/users | Register a user
+POST   /api/v1/users | Create a user(can be an admin user)
 GET    /api/v1/users | Get all users
 GET   /api/v1/users/id | Get a single user
 PUT  /api/v1/users/id | Update a single user
@@ -117,7 +117,7 @@ https://book-a-meal-api.herokuapp.com/apidocs
 
 ## Versioning
 
-Most recent version is version 1
+Most recent version is version 2
 
 ## Authors
 
