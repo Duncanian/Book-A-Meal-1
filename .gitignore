@@ -3,6 +3,7 @@ env
 .vscode
 .pytest_cache
 env.bat
+nodeids
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -105,3 +106,4 @@ ENV/
 
 # mypy
 .mypy_cache/
+tests/.pytest_cache/v/cache/nodeids
