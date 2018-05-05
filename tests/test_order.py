@@ -16,9 +16,19 @@ class OrderTests(BaseTests):
     
     def test_get_one(self):
         """Tests successfully getting an order item through the orders endpoint"""
-        data = json.dumps({"order_item" : "Rice and Beans", "price" : 400})
+        meal = json.dumps({"meal_item" : "Rice and Beans", "price" : 400})
+        menu = json.dumps({"menu_option" : "Rice and Beans", "price" : 400})
+        order = json.dumps({"order_item" : "Rice and Beans", "price" : 400})
         response = self.app.post(
-            '/api/v2/orders', data=data,
+            '/api/v2/meals', data=meal,
+            content_type='application/json',
+            headers=self.admin_header)
+        response = self.app.post(
+            '/api/v2/menu', data=menu,
+            content_type='application/json',
+            headers=self.admin_header)
+        response = self.app.post(
+            '/api/v2/orders', data=order,
             content_type='application/json',
             headers=self.user_header)
         response = self.app.get('/api/v2/orders/1', headers=self.user_header)
@@ -31,12 +41,22 @@ class OrderTests(BaseTests):
 
     def test_successful_update(self):
         """Test a successful order item update"""
-        data = json.dumps({"order_item" : "Rice and Beans", "price" : 400})
+        meal = json.dumps({"meal_item" : "Rice and Beans", "price" : 400})
+        menu = json.dumps({"menu_option" : "Rice and Beans", "price" : 400})
+        order = json.dumps({"order_item" : "Rice and Beans", "price" : 400})
         response = self.app.post(
-            '/api/v2/orders', data=data,
+            '/api/v2/meals', data=meal,
+            content_type='application/json',
+            headers=self.admin_header)
+        response = self.app.post(
+            '/api/v2/menu', data=menu,
+            content_type='application/json',
+            headers=self.admin_header)
+        response = self.app.post(
+            '/api/v2/orders', data=order,
             content_type='application/json',
             headers=self.user_header)
-        data = json.dumps({"order_item" : "Pilau with spices", "price" : 600})
+        data = json.dumps({"order_item" : "Rice and Beans", "price" : 950})
         response = self.app.put(
             '/api/v2/orders/1', data=data,
             content_type='application/json',
@@ -54,9 +74,19 @@ class OrderTests(BaseTests):
 
     def test_successful_deletion(self):
         """Test a successful order_item deletion"""
-        data = json.dumps({"order_item" : "Rice and Beans", "price" : 400})
+        meal = json.dumps({"meal_item" : "Rice and Beans", "price" : 400})
+        menu = json.dumps({"menu_option" : "Rice and Beans", "price" : 400})
+        order = json.dumps({"order_item" : "Rice and Beans", "price" : 400})
         response = self.app.post(
-            '/api/v2/orders', data=data,
+            '/api/v2/meals', data=meal,
+            content_type='application/json',
+            headers=self.admin_header)
+        response = self.app.post(
+            '/api/v2/menu', data=menu,
+            content_type='application/json',
+            headers=self.admin_header)
+        response = self.app.post(
+            '/api/v2/orders', data=order,
             content_type='application/json',
             headers=self.user_header)
         response = self.app.delete('/api/v2/orders/1', headers=self.admin_header)

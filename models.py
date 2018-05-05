@@ -51,20 +51,25 @@ class User(db.Model):
     def update_user(user_id, username, email, password, admin=False):
         """Updates user information"""
         user = User.query.get(user_id)
+        by_email = User.query.filter_by(email=email).first()
         
-        if not user:
+        if user is None:
             return make_response(jsonify({"message" : "user does not exists"}), 404)
-        user.username = username
-        user.email = email
-        user.password = generate_password_hash(password, method='sha256')
-        user.admin = admin
-        db.session.commit()
-        return make_response(jsonify({
-            "message" : "user has been successfully updated",
-            str(user.id) : {"username" : user.username,
-            "email" : user.email,
-            "password" : user.password,
-            "admin" : user.admin}}), 200)
+
+        if by_email is None:
+            user.username = username
+            user.email = email
+            user.password = generate_password_hash(password, method='sha256')
+            user.admin = admin
+            db.session.commit()
+            return make_response(jsonify({
+                "message" : "user has been successfully updated",
+                str(user.id) : {"username" : user.username,
+                "email" : user.email,
+                "password" : user.password,
+                "admin" : user.admin}}), 200)
+
+        return make_response(jsonify({"message" : "user with that email already exists"}), 400)
 
 
     @staticmethod
@@ -129,16 +134,21 @@ class Meal(db.Model):
     def update_meal(meal_id, meal_item, price):
         """Updates meal item information"""
         meal = Meal.query.get(meal_id)
-        
-        if not meal:
+        by_name = Meal.query.filter_by(meal_item=meal_item).first()
+
+        if meal is None:
             return make_response(jsonify({"message" : "meal does not exists"}), 404)
-        meal.meal_item = meal_item
-        meal.price = price
-        db.session.commit()
-        return make_response(jsonify({
-            "message" : "meal has been successfully updated",
-            str(meal.id) : {"meal_item" : meal.meal_item,
-            "price" : meal.price}}), 200)
+
+        if by_name is None:
+            meal.meal_item = meal_item
+            meal.price = price
+            db.session.commit()
+            return make_response(jsonify({
+                "message" : "meal has been successfully updated",
+                str(meal.id) : {"meal_item" : meal.meal_item,
+                "price" : meal.price}}), 200)
+
+        return make_response(jsonify({"message" : "meal item with that name already exists"}), 400)
 
     @staticmethod
     def delete_meal(meal_id):
@@ -157,7 +167,7 @@ class Meal(db.Model):
         """Gets a particular meal item"""
         meal = Meal.query.get(meal_id)
         
-        if not meal:
+        if meal is None:
             return make_response(jsonify({"message" : "meal does not exists"}), 404)
         
         info = {"id" : meal.id, "meal_item" : meal.meal_item, "price" : meal.price}
@@ -180,8 +190,13 @@ class Menu(db.Model):
     def create_menu(cls, menu_option, price):
         """Creates a new menu option and ensures that the name is unique"""
         by_name = cls.query.filter_by(menu_option=menu_option).first()
+        in_meals = Meal.query.filter_by(meal_item=menu_option).first()
 
         if by_name is None:
+            if in_meals is None:
+                return make_response(jsonify({
+                    "message" : "kindly add the item to the meals tables before adding it in the menu"}), 400)
+
             new_menu = cls(menu_option=menu_option, price=price)
             db.session.add(new_menu)
             db.session.commit()
@@ -196,10 +211,14 @@ class Menu(db.Model):
     def update_menu(menu_id, menu_option, price):
         """Updates menu option information"""
         menu = Menu.query.get(menu_id)
+        in_meals = Meal.query.filter_by(meal_item=menu_option).first()
         
         if menu is None:
             return make_response(jsonify({"message" : "menu option does not exists"}), 404)
 
+        if in_meals is None:
+                return make_response(jsonify({
+                    "message" : "kindly add the item to the meals table before adding it in the menu"}), 400)
         menu.menu_option = menu_option
         menu.price = price
         db.session.commit()
@@ -251,6 +270,11 @@ class Order(db.Model):
     @classmethod
     def create_order(cls, order_item, price, client_id, client_email):
         """Creates a new order item"""
+        in_menu = Menu.query.filter_by(menu_option=order_item).first()
+
+        if in_menu is None:
+                return make_response(jsonify({
+                    "message" : "kindly ensure that your order item is in the menu"}), 400)
         
         new_order = cls(order_item=order_item, price=price, client_id=client_id, client_email=client_email)
         db.session.add(new_order)
@@ -266,9 +290,14 @@ class Order(db.Model):
     def update_order(order_id, order_item, price):
         """Updates order item information"""
         order = Order.query.get(order_id)
+        in_menu = Menu.query.filter_by(menu_option=order_item).first()
         
         if order is None:
             return make_response(jsonify({"message" : "order does not exists"}), 404)
+    
+        if in_menu is None:
+                return make_response(jsonify({
+                    "message" : "kindly ensure that your order item is in the menu"}), 400)
         order.order_item = order_item
         order.price = price
         db.session.commit()

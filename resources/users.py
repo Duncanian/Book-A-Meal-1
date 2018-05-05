@@ -168,7 +168,7 @@ class UserList(Resource):
             location=['form', 'json'])
         super().__init__()
 
-    @admin_required
+
     def post(self):
         """Create a new user who can have admin privilege"""
         kwargs = self.reqparse.parse_args()

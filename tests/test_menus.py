@@ -31,22 +31,32 @@ class MenusTests(BaseTests):
 
     def test_good_creation(self):
         """Test admin successfully creating a new menu option"""
-        data = json.dumps({"menu_option" : "Rice and Beans", "price" : 400})
+        meal = json.dumps({"meal_item" : "Rice and Beans", "price" : 400})
+        menu = json.dumps({"menu_option" : "Rice and Beans", "price" : 400})
         response = self.app.post(
-            '/api/v2/menu', data=data,
+            '/api/v2/meals', data=meal,
+            content_type='application/json',
+            headers=self.admin_header)
+        response = self.app.post(
+            '/api/v2/menu', data=menu,
             content_type='application/json',
             headers=self.admin_header)
         self.assertEqual(response.status_code, 201)
 
     def test_creation_existing_name(self):
         """Tests unsuccessful menu option creation because of existing name"""
-        data = json.dumps({"menu_option" : "Fries and Chicken", "price" : 400})
+        meal = json.dumps({"meal_item" : "Fries and Chicken", "price" : 400})
+        menu = json.dumps({"menu_option" : "Fries and Chicken", "price" : 400})
+        response = self.app.post(
+            '/api/v2/meals', data=meal,
+            content_type='application/json',
+            headers=self.admin_header)
         res = self.app.post( # pylint: disable=W0612
-            '/api/v2/menu', data=data,
+            '/api/v2/menu', data=menu,
             content_type='application/json',
             headers=self.admin_header)
         response = self.app.post(
-            '/api/v2/menu', data=data,
+            '/api/v2/menu', data=menu,
             content_type='application/json',
             headers=self.admin_header)
         self.assertEqual(response.status_code, 400)

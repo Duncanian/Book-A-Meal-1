@@ -50,7 +50,7 @@ class BaseTests(unittest.TestCase):
                 '/api/v2/auth/signup', data=self.user_reg,
                 content_type='application/json')
             register_admin = self.app.post(
-                '/api/v2/auth/signup', data=self.admin_reg,
+                '/api/v2/users', data=self.admin_reg,
                 content_type='application/json')
             user_result = self.app.post(
                 '/api/v2/auth/login', data=self.user_log,
@@ -61,7 +61,6 @@ class BaseTests(unittest.TestCase):
             user_response = json.loads(user_result.get_data(as_text=True))
             user_token = user_response["token"]
             self.user_header = {"Content-Type" : "application/json", "x-access-token" : user_token}
-
             admin_response = json.loads(admin_result.get_data(as_text=True))
             admin_token = admin_response["token"]
             self.admin_header = {"Content-Type" : "application/json", "x-access-token" : admin_token}

@@ -21,9 +21,19 @@ class OrdersTests(BaseTests):
 
     def test_successful_creation(self):
         """Tests successfully creating a new order item"""
-        data = json.dumps({"order_item" : "Rice and Beans", "price" : 400})
+        meal = json.dumps({"meal_item" : "Rice and Beans", "price" : 400})
+        menu = json.dumps({"menu_option" : "Rice and Beans", "price" : 400})
+        order = json.dumps({"order_item" : "Rice and Beans", "price" : 400})
         response = self.app.post(
-            '/api/v2/orders', data=data,
+            '/api/v2/meals', data=meal,
+            content_type='application/json',
+            headers=self.admin_header)
+        response = self.app.post(
+            '/api/v2/menu', data=menu,
+            content_type='application/json',
+            headers=self.admin_header)
+        response = self.app.post(
+            '/api/v2/orders', data=order,
             content_type='application/json',
             headers=self.user_header)
         self.assertEqual(response.status_code, 200)
