@@ -1,4 +1,4 @@
-"""Contains all endpoints to manipulate meal information
+"""Contains all endpoints to manipulate meals, menu and orders information
 """
 import datetime
 
@@ -122,12 +122,6 @@ class MenuList(Resource):
             type=inputs.regex(r"(.*\S.*)"),
             help='kindly provide a menu option',
             location=['form', 'json'])
-        self.reqparse.add_argument(
-            'price',
-            required=True,
-            type=int,
-            help='kindly provide a price(should be a valid number)',
-            location=['form', 'json'])
         super().__init__()
 
     @admin_required
@@ -135,8 +129,7 @@ class MenuList(Resource):
         """Adds a menu option to the menu"""
         kwargs = self.reqparse.parse_args()
         response = models.Menu.create_menu(
-            menu_option=kwargs.get('menu_option'),
-            price=kwargs.get('price'))
+            menu_option=kwargs.get('menu_option'))
         return response
 
     @token_required
@@ -158,12 +151,6 @@ class Menu(Resource):
             type=inputs.regex(r"(.*\S.*)"),
             help='kindly provide a menu option',
             location=['form', 'json'])
-        self.reqparse.add_argument(
-            'price',
-            required=True,
-            type=int,
-            help='kindly provide a price(should be a valid number)',
-            location=['form', 'json'])
         super().__init__()
 
     @token_required
@@ -178,8 +165,7 @@ class Menu(Resource):
         kwargs = self.reqparse.parse_args()
         response = models.Menu.update_menu(
             menu_id=menu_id,
-            menu_option=kwargs.get('menu_option'),
-            price=kwargs.get('price'))
+            menu_option=kwargs.get('menu_option'))
         return response
 
     @admin_required
@@ -196,18 +182,13 @@ class OrderList(Resource):
     def __init__(self):
         self.now = datetime.datetime.utcnow() # timer
         self.closing = datetime.time(23, 0, 0)
+
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'order_item',
             required=True,
             type=inputs.regex(r"(.*\S.*)"),
             help='kindly provide an order item',
-            location=['form', 'json'])
-        self.reqparse.add_argument(
-            'price',
-            required=True,
-            type=int,
-            help='kindly provide a price(should be a valid number)',
             location=['form', 'json'])
         super().__init__()
 
@@ -222,17 +203,25 @@ class OrderList(Resource):
             client = models.User.query.get(user_id)
             response = models.Order.create_order(
                 order_item=kwargs.get('order_item'),
-                price=kwargs.get('price'),
                 client_id=client.id,
                 client_email=client.email)
             return response
         return make_response(jsonify({"message" : "sorry, we do not take orders past 11PM"}), 200)
-    
-    @admin_required
+
+
+    @token_required
     def get(self):
-        """Gets all orders"""
-        orders = [marshal(order, order_fields) for order in models.Order.query.order_by(models.Order.id.desc()).all()]  
-        return make_response(jsonify({'orders': orders}), 200)
+        """Gets all orders for admin and get all orders belonging to the current authenticated user"""
+        token = request.headers['x-access-token']
+        data = jwt.decode(token, config.Config.SECRET_KEY)
+        admin = data['admin']
+        user_id = data['id']
+        user_orders = [marshal(order, order_fields) for order in models.Order.query.filter_by(client_id=user_id).all()]
+
+        if admin:
+            orders = [marshal(order, order_fields) for order in models.Order.query.order_by(models.Order.id.desc()).all()]  
+            return make_response(jsonify({'orders': orders}), 200)
+        return make_response(jsonify({'your orders': user_orders}), 200)
 
 
 class Order(Resource):
@@ -242,6 +231,7 @@ class Order(Resource):
     def __init__(self):
         self.now = datetime.datetime.utcnow() # timer
         self.closing = datetime.time(23, 0, 0)
+
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'order_item',
@@ -249,35 +239,60 @@ class Order(Resource):
             type=inputs.regex(r"(.*\S.*)"),
             help='kindly provide an order item',
             location=['form', 'json'])
-        self.reqparse.add_argument(
-            'price',
-            required=True,
-            type=int,
-            help='kindly provide a price(should be a valid number)',
-            location=['form', 'json'])
         super().__init__()
 
     @token_required
     def get(self, order_id):
         """Get a particular order"""
+        token = request.headers['x-access-token']
+        data = jwt.decode(token, config.Config.SECRET_KEY)
+        admin = data['admin']
+        user_id = data['id']
+        order = models.Order.query.filter_by(client_id=user_id, id=order_id).first()
         response = models.Order.get_order(order_id)
+
+        if admin:
+            return response
+        
+        if order is None:
+            return make_response(jsonify({"message" : "order does not exists or it does not belong to you"}), 404)
         return response
+
 
     @token_required
     def put(self, order_id):
         """Update a particular order"""
         if self.now.hour < self.closing.hour:
             kwargs = self.reqparse.parse_args()
-            response = models.Order.update_order(order_id, **kwargs)
-            return response
+            token = request.headers['x-access-token']
+            data = jwt.decode(token, config.Config.SECRET_KEY)
+            admin = data['admin']
+            user_id = data['id']
+            order = models.Order.query.get(order_id)
+
+            if admin or order.client_id == user_id:
+                response = models.Order.update_order(
+                    order_id=order_id, order_item=kwargs.get('order_item'))
+                return response
+            return make_response(jsonify({
+                "message" : "sorry, you cannot update this order since it does not belong to you"}), 401)
         return make_response(jsonify({"message" : "sorry, we do not take orders past 11PM"}), 200)
         
 
     @token_required
     def delete(self, order_id):
         """Delete a particular order"""
-        response = models.Order.delete_order(order_id)
-        return response
+        token = request.headers['x-access-token']
+        data = jwt.decode(token, config.Config.SECRET_KEY)
+        admin = data['admin']
+        user_id = data['id']
+        order = models.Order.query.get(order_id)
+
+        if admin or order.client_id == user_id:
+            response = models.Order.delete_order(order_id)
+            return response
+        return make_response(jsonify({
+                "message" : "sorry, you cannot delete this order since it does not belong to you"}), 401)
 
 
 meals_api = Blueprint('resources.meals', __name__)
