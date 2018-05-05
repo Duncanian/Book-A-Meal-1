@@ -11,7 +11,7 @@ import models
 
 
 def token_required(f):
-    """Checks for authenticated users with valid token in request header"""
+    """Checks for authenticated users with valid token in the header"""
     @wraps(f)
     def decorated(*args, **kwargs):
         """validate token provided"""
@@ -36,6 +36,7 @@ def admin_required(f):
     """Checks for authenticated admins with valid token in the header"""
     @wraps(f)
     def decorated(*args, **kwargs):
+        """validate token provided and ensures the user is an admin"""
         token = None
 
         if 'x-access-token' in request.headers:

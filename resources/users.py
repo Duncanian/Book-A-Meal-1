@@ -16,7 +16,6 @@ user_fields = {
     'id' : fields.Integer,
     'username': fields.String,
     'email': fields.String,
-    'password': fields.String,
     'admin': fields.Boolean
 }
 
@@ -119,8 +118,9 @@ class Login(Resource):
                 'exp' : datetime.datetime.utcnow() + datetime.timedelta(weeks=2)},
                 config.Config.SECRET_KEY)
 
-            return make_response(jsonify({"message" : "you have been successfully logged in",
-                                          "token" : token.decode('UTF-8')}), 200)
+            return make_response(jsonify({
+                "message" : "success, add the token to the header as x-access-token for authentication",
+                "token" : token.decode('UTF-8')}), 200)
         
         return make_response(jsonify({"message" : "invalid email address or password"}), 400)
 
@@ -169,6 +169,7 @@ class UserList(Resource):
         super().__init__()
 
 
+    # can be exploited, resolve by creating an initial superuser and making this admin_required
     def post(self):
         """Create a new user who can have admin privilege"""
         kwargs = self.reqparse.parse_args()
