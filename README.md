@@ -40,7 +40,22 @@ $ source env/bin/activate
 $ pip install -r requirements.txt
 ```
 
-4. Run the development server
+4. Initialize environment variables
+
+```
+$ export SECRET_KEY=<SECRET KEY>
+$ export TESTING_DATABASE_URI=<URI>
+$ export DEVELOPMENT_DATABASE_URI=<URI>
+```
+
+5. Run migrations
+
+```
+$ python manage.py db migrate
+$ python manage.py db upgrade
+```
+
+6. Run the development server
 
 ```
 $ python app.py
@@ -58,7 +73,7 @@ Endpoint | Functionality
 ------------ | -------------
 POST   /api/v1/auth/signup | Register a user
 POST   /api/v1/auth/login | Log in user
-POST   /api/v1/users | Create a user(can be an admin user)
+POST   /api/v1/users | Create a user
 GET    /api/v1/users | Get all users
 GET   /api/v1/users/id | Get a single user
 PUT  /api/v1/users/id | Update a single user
