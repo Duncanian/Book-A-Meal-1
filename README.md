@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/lennykioko/Book-A-Meal.svg?branch=Develop-API-v1)](https://travis-ci.org/lennykioko/Book-A-Meal)
-[![Coverage Status](https://coveralls.io/repos/github/lennykioko/Book-A-Meal/badge.svg?branch=Develop-API-v1)](https://coveralls.io/github/lennykioko/Book-A-Meal?branch=Develop-API-v1)
+[![Build Status](https://travis-ci.org/lennykioko/Book-A-Meal.svg?branch=Develop-API-v2)](https://travis-ci.org/lennykioko/Book-A-Meal)
+[![Coverage Status](https://coveralls.io/repos/github/lennykioko/Book-A-Meal/badge.svg?branch=Develop-API-v2)](https://coveralls.io/github/lennykioko/Book-A-Meal?branch=Develop-API-v2)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 # Book-A-Meal
