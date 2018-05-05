@@ -125,7 +125,6 @@ class Login(Resource):
         return make_response(jsonify({"message" : "invalid email address or password"}), 400)
 
 
-
 class UserList(Resource):
     "Contains a POST method to register a new user and a GET method to get all users"
 
