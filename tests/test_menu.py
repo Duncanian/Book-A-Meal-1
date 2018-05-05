@@ -16,16 +16,6 @@ class MenuTests(BaseTests):
 
     def test_get_one(self):
         """Test user or admin successfully getting a menu option"""
-        meal = json.dumps({"meal_item" : "Rice and Beans", "price" : 400})
-        menu = json.dumps({"menu_option" : "Rice and Beans", "price" : 400})
-        response = self.app.post(
-            '/api/v2/meals', data=meal,
-            content_type='application/json',
-            headers=self.admin_header)
-        response = self.app.post(
-            '/api/v2/menu', data=menu,
-            content_type='application/json',
-            headers=self.admin_header)
         response = self.app.get('/api/v2/menu/1', headers=self.user_header)
         self.assertEqual(response.status_code, 200)
 
@@ -37,7 +27,7 @@ class MenuTests(BaseTests):
     def test_successful_update(self):
         """Test a successful menu option update"""
         meal = json.dumps({"meal_item" : "Rice and Beans", "price" : 400})
-        menu = json.dumps({"menu_option" : "Rice and Beans", "price" : 400})
+        menu = json.dumps({"menu_option" : "Rice and Beans"})
         updated_meal = json.dumps({"meal_item" : "Pilau with spices", "price" : 600})
 
         response = self.app.post(
@@ -52,7 +42,7 @@ class MenuTests(BaseTests):
             '/api/v2/menu', data=menu,
             content_type='application/json',
             headers=self.admin_header)
-        data = json.dumps({"menu_option" : "Pilau with spices", "price" : 600})
+        data = json.dumps({"menu_option" : "Pilau with spices"})
         response = self.app.put(
             '/api/v2/menu/1', data=data,
             content_type='application/json',
@@ -68,16 +58,6 @@ class MenuTests(BaseTests):
 
     def test_successful_deletion(self):
         """Test a successful menu item deletion"""
-        meal = json.dumps({"meal_item" : "Rice and Beans", "price" : 400})
-        menu = json.dumps({"menu_option" : "Rice and Beans", "price" : 400})
-        response = self.app.post(
-            '/api/v2/meals', data=meal,
-            content_type='application/json',
-            headers=self.admin_header)
-        response = self.app.post(
-            '/api/v2/menu', data=menu,
-            content_type='application/json',
-            headers=self.admin_header)
         response = self.app.delete('/api/v2/menu/1', headers=self.admin_header)
         self.assertEqual(response.status_code, 200)
 

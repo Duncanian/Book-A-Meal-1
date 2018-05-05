@@ -40,6 +40,7 @@ class UsersTests(BaseTests):
             headers=self.admin_header)
         self.assertEqual(response.status_code, 201)
 
+
     def test_user_empty_body(self):
         """Test unsuccessful user creation because of empty body"""
         data = json.dumps({})

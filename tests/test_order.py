@@ -15,35 +15,20 @@ class OrderTests(BaseTests):
 
     
     def test_get_one(self):
-        """Tests successfully getting an order item through the orders endpoint"""
-        meal = json.dumps({"meal_item" : "Rice and Beans", "price" : 400})
-        menu = json.dumps({"menu_option" : "Rice and Beans", "price" : 400})
-        order = json.dumps({"order_item" : "Rice and Beans", "price" : 400})
-        response = self.app.post(
-            '/api/v2/meals', data=meal,
-            content_type='application/json',
-            headers=self.admin_header)
-        response = self.app.post(
-            '/api/v2/menu', data=menu,
-            content_type='application/json',
-            headers=self.admin_header)
-        response = self.app.post(
-            '/api/v2/orders', data=order,
-            content_type='application/json',
-            headers=self.user_header)
-        response = self.app.get('/api/v2/orders/1', headers=self.user_header)
+        """Tests successfully getting an order item"""
+        response = self.app.get('/api/v2/orders/1', headers=self.admin_header)
         self.assertEqual(response.status_code, 200)
 
     def test_getting_non_existing(self):
         """Test getting an order_item while providing non-existing id"""
-        response = self.app.get('/api/v2/orders/57', headers=self.user_header)
+        response = self.app.get('/api/v2/orders/57', headers=self.admin_header)
         self.assertEqual(response.status_code, 404)
 
     def test_successful_update(self):
         """Test a successful order item update"""
         meal = json.dumps({"meal_item" : "Rice and Beans", "price" : 400})
-        menu = json.dumps({"menu_option" : "Rice and Beans", "price" : 400})
-        order = json.dumps({"order_item" : "Rice and Beans", "price" : 400})
+        menu = json.dumps({"menu_option" : "Rice and Beans"})
+        order = json.dumps({"order_item" : "Rice and Beans"})
         response = self.app.post(
             '/api/v2/meals', data=meal,
             content_type='application/json',
@@ -55,40 +40,25 @@ class OrderTests(BaseTests):
         response = self.app.post(
             '/api/v2/orders', data=order,
             content_type='application/json',
-            headers=self.user_header)
-        data = json.dumps({"order_item" : "Rice and Beans", "price" : 950})
+            headers=self.admin_header)
+        data = json.dumps({"order_item" : "nyama choma"})
         response = self.app.put(
-            '/api/v2/orders/1', data=data,
+            '/api/v2/orders/2', data=data,
             content_type='application/json',
-            headers=self.user_header)
+            headers=self.admin_header)
         self.assertEqual(response.status_code, 200)
 
     def test_updating_non_existing(self):
         """Test updating non_existing order_item"""
-        data = json.dumps({"order_item" : "Pilau with spices", "price" : 600})
+        data = json.dumps({"order_item" : "Pilau with spices"})
         response = self.app.put(
             '/api/v2/orders/45', data=data,
             content_type='application/json',
-            headers=self.user_header)
+            headers=self.admin_header)
         self.assertEqual(response.status_code, 404)
 
     def test_successful_deletion(self):
         """Test a successful order_item deletion"""
-        meal = json.dumps({"meal_item" : "Rice and Beans", "price" : 400})
-        menu = json.dumps({"menu_option" : "Rice and Beans", "price" : 400})
-        order = json.dumps({"order_item" : "Rice and Beans", "price" : 400})
-        response = self.app.post(
-            '/api/v2/meals', data=meal,
-            content_type='application/json',
-            headers=self.admin_header)
-        response = self.app.post(
-            '/api/v2/menu', data=menu,
-            content_type='application/json',
-            headers=self.admin_header)
-        response = self.app.post(
-            '/api/v2/orders', data=order,
-            content_type='application/json',
-            headers=self.user_header)
         response = self.app.delete('/api/v2/orders/1', headers=self.admin_header)
         self.assertEqual(response.status_code, 200)
 

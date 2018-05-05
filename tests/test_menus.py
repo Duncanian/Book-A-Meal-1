@@ -32,7 +32,7 @@ class MenusTests(BaseTests):
     def test_good_creation(self):
         """Test admin successfully creating a new menu option"""
         meal = json.dumps({"meal_item" : "Rice and Beans", "price" : 400})
-        menu = json.dumps({"menu_option" : "Rice and Beans", "price" : 400})
+        menu = json.dumps({"menu_option" : "Rice and Beans"})
         response = self.app.post(
             '/api/v2/meals', data=meal,
             content_type='application/json',
@@ -46,7 +46,7 @@ class MenusTests(BaseTests):
     def test_creation_existing_name(self):
         """Tests unsuccessful menu option creation because of existing name"""
         meal = json.dumps({"meal_item" : "Fries and Chicken", "price" : 400})
-        menu = json.dumps({"menu_option" : "Fries and Chicken", "price" : 400})
+        menu = json.dumps({"menu_option" : "Fries and Chicken"})
         response = self.app.post(
             '/api/v2/meals', data=meal,
             content_type='application/json',
@@ -63,25 +63,7 @@ class MenusTests(BaseTests):
 
     def test_creation_empty_name(self):
         """Tests unsuccessful menu option creation because of empty name"""
-        data = json.dumps({"menu_option" : "", "price" : 400})
-        response = self.app.post(
-            '/api/v2/menu', data=data,
-            content_type='application/json',
-            headers=self.admin_header)
-        self.assertEqual(response.status_code, 400)
-
-    def test_creation_empty_price(self):
-        """Tests unsuccessful menu option creation because of empty price"""
-        data = json.dumps({"menu_option" : "Ugali and Kuku", "price" : ""})
-        response = self.app.post(
-            '/api/v2/menu', data=data,
-            content_type='application/json',
-            headers=self.admin_header)
-        self.assertEqual(response.status_code, 400)
-
-    def test_creation_invalid_price(self):
-        """Tests unsuccessful menu option creation because of invalid price"""
-        data = json.dumps({"menu_option" : "Mchele and Pork", "price" : "351.9"})
+        data = json.dumps({"menu_option" : ""})
         response = self.app.post(
             '/api/v2/menu', data=data,
             content_type='application/json',
