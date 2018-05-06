@@ -64,7 +64,7 @@ class MealList(Resource):
     @admin_required
     def get(self):
         """Gets all meal items"""
-        meals = [marshal(meal, meal_fields) for meal in models.Meal.query.order_by(models.Meal.id.desc()).all()]  
+        meals = [marshal(meal, meal_fields) for meal in models.Meal.query.order_by(models.Meal.id.desc()).all()]
         return make_response(jsonify({'meals': meals}), 200)
 
 
@@ -135,7 +135,7 @@ class MenuList(Resource):
     @token_required
     def get(self):
         """Gets all menu options on the menu"""
-        menus = [marshal(menu, menu_fields) for menu in models.Menu.query.order_by(models.Menu.id.desc()).all()]  
+        menus = [marshal(menu, menu_fields) for menu in models.Menu.query.order_by(models.Menu.id.desc()).all()]
         return make_response(jsonify({'menu': menus}), 200)
 
 
@@ -219,7 +219,7 @@ class OrderList(Resource):
         user_orders = [marshal(order, order_fields) for order in models.Order.query.filter_by(client_id=user_id).all()]
 
         if admin:
-            orders = [marshal(order, order_fields) for order in models.Order.query.order_by(models.Order.id.desc()).all()]  
+            orders = [marshal(order, order_fields) for order in models.Order.query.order_by(models.Order.id.desc()).all()]
             return make_response(jsonify({'orders': orders}), 200)
         return make_response(jsonify({'your orders': user_orders}), 200)
 
@@ -253,9 +253,10 @@ class Order(Resource):
 
         if admin:
             return response
-        
+
         if order is None:
-            return make_response(jsonify({"message" : "order does not exists or it does not belong to you"}), 404)
+            return make_response(jsonify({
+                "message" : "order does not exists or it does not belong to you"}), 404)
         return response
 
 
@@ -277,7 +278,7 @@ class Order(Resource):
             return make_response(jsonify({
                 "message" : "sorry, you cannot update this order since it does not belong to you"}), 401)
         return make_response(jsonify({"message" : "sorry, we do not take orders past 11PM"}), 200)
-        
+
 
     @token_required
     def delete(self, order_id):

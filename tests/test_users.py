@@ -18,21 +18,22 @@ class UsersTests(BaseTests):
         """Tests successfully getting all users"""
         response = self.app.get('/api/v2/users', headers=self.admin_header)
         self.assertEqual(response.status_code, 200)
-    
+
     def test_user_get_all(self):
         """Tests normal user unauthorized to get get all users"""
         response = self.app.get('/api/v2/users', headers=self.user_header)
         self.assertEqual(response.status_code, 401)
-    
+
     def test_no_token_get_all(self):
         """Tests unauthorized to get all users without a token"""
         response = self.app.get('/api/v2/users')
         self.assertEqual(response.status_code, 401)
-    
+
     def test_invalid_token_admin(self):
         """Test invalid token in an admin_required endpoint"""
-        invalid_token = {"Content-Type" : "application/json",
-        "x-access-token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NCwiYWRtaW4iOnRydWUsImV4cCI6MTUyNjczNzQ5Nvm2laNiJek7X266RLLk-bWL-ZF2RuD32FBvg_G8KyM"}
+        invalid_token = {
+            "Content-Type" : "application/json",
+            "x-access-token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NCwiYWRtaW4iOnRydWUsImV4cCI6MTUyNjczNzQ5Nvm2laNiJek7X266RLLk-bWL-ZF2RuD32FBvg_G8KyM"}
         response = self.app.get(
             '/api/v2/users',
             headers=invalid_token)

@@ -18,12 +18,12 @@ class MealsTests(BaseTests):
         """Test admin successfully getting all meals"""
         response = self.app.get('/api/v2/meals', headers=self.admin_header)
         self.assertEqual(response.status_code, 200)
-    
+
     def test_user_get_all(self):
         """Test user unsuccessfully getting all meals"""
         response = self.app.get('/api/v2/meals', headers=self.user_header)
         self.assertEqual(response.status_code, 401)
-    
+
     def test_no_token_get_all(self):
         """Tests unauthenticated user unsuccessfully getting all meals"""
         response = self.app.get('/api/v2/meals')

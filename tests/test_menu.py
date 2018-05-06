@@ -52,8 +52,9 @@ class MenuTests(BaseTests):
     def test_updating_non_existing(self):
         """Test updating non_existing menu option"""
         data = json.dumps({"menu_option" : "Pilau with spices", "price" : 600})
-        response = self.app.put('/api/v2/menu/25', data=data,
-        content_type='application/json', headers=self.admin_header)
+        response = self.app.put(
+            '/api/v2/menu/25', data=data,
+            content_type='application/json', headers=self.admin_header)
         self.assertEqual(response.status_code, 404)
 
     def test_successful_deletion(self):

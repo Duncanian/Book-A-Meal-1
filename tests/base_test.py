@@ -27,7 +27,7 @@ class BaseTests(unittest.TestCase):
             "email" : "user@gmail.com",
             "password" : "12345678",
             "confirm_password" : "12345678"})
-        
+
         admin_reg = json.dumps({
             "username" : "admin",
             "email" : "admin@gmail.com",
@@ -38,13 +38,13 @@ class BaseTests(unittest.TestCase):
         self.user_log = json.dumps({
             "email" : "user@gmail.com",
             "password" : "12345678"})
-        
+
         admin_log = json.dumps({
-             "email" : "admin@gmail.com",
+            "email" : "admin@gmail.com",
             "password" : "12345678"})
 
         self.app = self.application.test_client()
-        
+
         with self.application.app_context():
             db.create_all()
             register_user = self.app.post(

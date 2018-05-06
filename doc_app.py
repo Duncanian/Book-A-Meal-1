@@ -5,7 +5,7 @@ import os
 from flasgger import Swagger
 
 from app import create_app
-import config
+
 
 app = create_app('config.DevelopmentConfig')
 swagger = Swagger(app)

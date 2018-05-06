@@ -9,7 +9,7 @@ import jwt
 
 import models
 import config
-from .auth import token_required, admin_required
+from .auth import admin_required
 
 
 user_fields = {
@@ -116,12 +116,12 @@ class Login(Resource):
                 'id' : user.id,
                 'admin' : user.admin,
                 'exp' : datetime.datetime.utcnow() + datetime.timedelta(weeks=2)},
-                config.Config.SECRET_KEY)
+                               config.Config.SECRET_KEY)
 
             return make_response(jsonify({
                 "message" : "success, add the token to the header as x-access-token for authentication",
                 "token" : token.decode('UTF-8')}), 200)
-        
+
         return make_response(jsonify({"message" : "invalid email address or password"}), 400)
 
 
@@ -187,9 +187,9 @@ class UserList(Resource):
     @admin_required
     def get(self):
         """Get all users"""
-        users = [marshal(user, user_fields) for user in models.User.query.order_by(models.User.id.desc()).all()]  
+        users = [marshal(user, user_fields) for user in models.User.query.order_by(models.User.id.desc()).all()]
         return make_response(jsonify({'users': users}), 200)
-    
+
 
 class User(Resource):
     """Contains GET PUT and DELETE methods for interacting with a particular user"""
@@ -255,14 +255,13 @@ class User(Resource):
 
             return make_response(jsonify({"message" : "password should be at least 8 characters"}), 400)
         return make_response(jsonify({"message" : "password and confirm password should be identical"}), 400)
-            
+
 
     @admin_required
     def delete(self, user_id):
         """Delete a particular user"""
         response = models.User.delete_user(user_id)
         return response
-
 
 
 users_api = Blueprint('resources.users', __name__)

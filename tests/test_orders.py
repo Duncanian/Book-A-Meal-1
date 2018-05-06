@@ -18,7 +18,7 @@ class OrdersTests(BaseTests):
         """Tests admin successfully getting all order items"""
         response = self.app.get('/api/v2/orders', headers=self.admin_header)
         self.assertEqual(response.status_code, 200)
-    
+
     def test_owner_get_all(self):
         """Tests user successfully getting all order items belonging to them"""
         response = self.app.get('/api/v2/orders', headers=self.user_header)

@@ -13,7 +13,7 @@ from .base_test import BaseTests
 class OrderTests(BaseTests):
     """Tests functionality of the orders endpoint"""
 
-    
+
     def test_get_one(self):
         """Tests successfully getting an order item"""
         response = self.app.get('/api/v2/orders/1', headers=self.admin_header)
@@ -66,7 +66,7 @@ class OrderTests(BaseTests):
         """Test a deleting order item that does not exist"""
         response = self.app.delete('/api/v2/orders/15', headers=self.admin_header)
         self.assertEqual(response.status_code, 404)
-    
+
     def test_not_owner_get(self):
         """Test user who's not owner trying to get a particular order"""
         user_reg = json.dumps({

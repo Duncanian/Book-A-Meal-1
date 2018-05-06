@@ -28,11 +28,12 @@ class MenusTests(BaseTests):
         """Test unauthenticated user unsuccessfully getting all menu options"""
         response = self.app.get('/api/v2/menu')
         self.assertEqual(response.status_code, 401)
-    
+
     def test_invalid_token_user(self):
         """Test invalid token in a token_required endpoint"""
-        invalid_token = {"Content-Type" : "application/json",
-        "x-access-token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NCwiYWRtaW4iOnRydWUsImV4cCI6MTUyNjczNzQ5Nvm2laNiJek7X266RLLk-bWL-ZF2RuD32FBvg_G8KyM"}
+        invalid_token = {
+            "Content-Type" : "application/json",
+            "x-access-token" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6NCwiYWRtaW4iOnRydWUsImV4cCI6MTUyNjczNzQ5Nvm2laNiJek7X266RLLk-bWL-ZF2RuD32FBvg_G8KyM"}
         response = self.app.get(
             '/api/v2/menu',
             headers=invalid_token)
