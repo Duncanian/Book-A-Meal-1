@@ -51,7 +51,6 @@ $ export DEVELOPMENT_DATABASE_URI=<URI>
 5. Run migrations
 
 ```
-$ python manage.py db migrate
 $ python manage.py db upgrade
 ```
 
