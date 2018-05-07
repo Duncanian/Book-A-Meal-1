@@ -271,6 +271,9 @@ class Order(Resource):
             user_id = data['id']
             order = models.Order.query.get(order_id)
 
+            if order is None:
+                return make_response(jsonify({"message" : "order does not exists"}), 404)
+
             if admin or order.client_id == user_id:
                 response = models.Order.update_order(
                     order_id=order_id, order_item=kwargs.get('order_item'))
@@ -288,6 +291,9 @@ class Order(Resource):
         admin = data['admin']
         user_id = data['id']
         order = models.Order.query.get(order_id)
+
+        if order is None:
+            return make_response(jsonify({"message" : "order does not exists"}), 404)
 
         if admin or order.client_id == user_id:
             response = models.Order.delete_order(order_id)
