@@ -1,4 +1,4 @@
-"""Handles database migrations"""
+"""Handles database migrations and handles superuser creation"""
 import re
 import sys
 
