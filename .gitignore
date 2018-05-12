@@ -2,6 +2,7 @@
 env
 .vscode
 .pytest_cache
+env.bat
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
