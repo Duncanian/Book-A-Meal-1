@@ -168,7 +168,7 @@ class UserList(Resource):
         super().__init__()
 
 
-    # can be exploited, resolve by creating an initial superuser and making this admin_required
+    @admin_required
     def post(self):
         """Create a new user who can have admin privilege"""
         kwargs = self.reqparse.parse_args()
