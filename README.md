@@ -1,4 +1,7 @@
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+![Home Image](https://raw.github.com/lennykioko/Book-A-Meal/master/image.jpg)
 
 # Book-A-Meal
 Book-A-Meal is an application that allows customers to make food orders and helps the food vendor know what the customers want to eat.
