@@ -6,7 +6,7 @@
 
 Book-A-Meal is an application that allows customers to make food orders and helps the food vendor know what the customers want to eat.
 
-![Home Image](https://raw.github.com/lennykioko/Book-A-Meal/Feature-UI/UI/static/img/image.jpg)
+![Home Image](https://raw.github.com/lennykioko/Book-A-Meal/master/UI/static/img/image.jpg)
 
 ## Getting Started
 
