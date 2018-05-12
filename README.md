@@ -1,9 +1,12 @@
-![Home Image](https://raw.github.com/lennykioko/Book-A-Meal/master/image.jpg)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+![Home Image](https://raw.github.com/lennykioko/Book-A-Meal/master/image.jpg)
+
 # Book-A-Meal
 Book-A-Meal is an application that allows customers to make food orders and helps the food vendor know what the customers want to eat.
+
+![Home Image](https://raw.github.com/lennykioko/Book-A-Meal/Feature-UI/UI/static/img/image.jpg)
 
 ## Required Features
 1. Users can create an account and log in
