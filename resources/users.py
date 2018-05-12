@@ -168,7 +168,7 @@ class UserList(Resource):
         super().__init__()
 
 
-    @admin_required
+    # to be secured in th near future
     def post(self):
         """Create a new user who can have admin privilege"""
         kwargs = self.reqparse.parse_args()
