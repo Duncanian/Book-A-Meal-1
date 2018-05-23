@@ -112,7 +112,7 @@ pylint app.py
 
 ## Deployment
 
-Ensure you use Productionconfig settings which have DEBUG set to False
+Ensure you use ProductionConfig settings which have DEBUG set to False
 
 ## Built With
 
@@ -131,7 +131,7 @@ https://book-a-meal-api.herokuapp.com/apidocs
 
 ## Versioning
 
-Most recent version is version 2
+Most recent version is version 3
 
 ## Authors
 
