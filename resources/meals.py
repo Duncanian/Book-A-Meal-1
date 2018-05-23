@@ -12,22 +12,24 @@ from .auth import token_required, admin_required
 
 meal_fields = {
     'id' : fields.Integer,
-    'meal_item': fields.String,
+    'name': fields.String,
     'price': fields.Integer,
+    'in_menu': fields.Boolean
 }
 
 menu_fields = {
     'id' : fields.Integer,
-    'menu_option': fields.String,
+    'name': fields.String,
     'price': fields.Integer,
 }
 
 order_fields = {
     'id' : fields.Integer,
-    'order_item': fields.String,
+    'meal_id': fields.Integer,
+    'meal_name': fields.String,
     'price': fields.Integer,
-    'client_id' : fields.Integer,
-    'client_email' : fields.String,
+    'user_id' : fields.Integer,
+    'user_email' : fields.String,
     'created_at' : fields.DateTime
 }
 
@@ -39,10 +41,10 @@ class MealList(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
-            'meal_item',
+            'name',
             required=True,
             type=inputs.regex(r"(.*\S.*)"),
-            help='kindly provide a meal item',
+            help='kindly provide a valid name',
             location=['form', 'json'])
         self.reqparse.add_argument(
             'price',
@@ -50,20 +52,27 @@ class MealList(Resource):
             type=int,
             help='kindly provide a price(should be a valid number)',
             location=['form', 'json'])
+        self.reqparse.add_argument(
+            'in_menu',
+            required=True,
+            help='kindly provide a valid boolean value',
+            type=inputs.boolean,
+            location=['form', 'json'])
         super().__init__()
 
     @admin_required
     def post(self):
-        """Adds a new meal item"""
+        """Adds a new meal"""
         kwargs = self.reqparse.parse_args()
         response = models.Meal.create_meal(
-            meal_item=kwargs.get('meal_item'),
-            price=kwargs.get('price'))
+            name=kwargs.get('name'),
+            price=kwargs.get('price'),
+            in_menu=kwargs.get('in_menu'))
         return response
 
     @admin_required
     def get(self):
-        """Gets all meal items"""
+        """Gets all meals"""
         meals = [marshal(meal, meal_fields) for meal in models.Meal.query.order_by(models.Meal.id.desc()).all()]
         return make_response(jsonify({'meals': meals}), 200)
 
@@ -75,16 +84,22 @@ class Meal(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
-            'meal_item',
+            'name',
             required=True,
             type=inputs.regex(r"(.*\S.*)"),
-            help='kindly provide a meal item',
+            help='kindly provide a valid name',
             location=['form', 'json'])
         self.reqparse.add_argument(
             'price',
             required=True,
             type=int,
             help='kindly provide a price(should be a valid number)',
+            location=['form', 'json'])
+        self.reqparse.add_argument(
+            'in_menu',
+            required=True,
+            help='kindly provide a valid boolean value',
+            type=inputs.boolean,
             location=['form', 'json'])
         super().__init__()
 
@@ -100,8 +115,9 @@ class Meal(Resource):
         kwargs = self.reqparse.parse_args()
         response = models.Meal.update_meal(
             meal_id=meal_id,
-            meal_item=kwargs.get('meal_item'),
-            price=kwargs.get('price'))
+            name=kwargs.get('name'),
+            price=kwargs.get('price'),
+            in_menu=kwargs.get('in_menu'))
         return response
 
     @admin_required
@@ -110,69 +126,50 @@ class Meal(Resource):
         response = models.Meal.delete_meal(meal_id)
         return response
 
+
 class MenuList(Resource):
-    """Contains GET and POST methods for manipulating menu data"""
-
-
+    """Contains GET and POST methods for manipulating the menu"""
+    
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
-            'menu_option',
+            'meal_id',
             required=True,
-            type=inputs.regex(r"(.*\S.*)"),
-            help='kindly provide a menu option',
+            type=int,
+            help='kindly provide a valid meal_id',
             location=['form', 'json'])
         super().__init__()
 
     @admin_required
     def post(self):
-        """Adds a menu option to the menu"""
+        """Adds a meal to the menu"""
         kwargs = self.reqparse.parse_args()
-        response = models.Menu.create_menu(
-            menu_option=kwargs.get('menu_option'))
+        response = models.Meal.add_to_menu(meal_id=kwargs.get('meal_id'))
         return response
 
     @token_required
     def get(self):
-        """Gets all menu options on the menu"""
-        menus = [marshal(menu, menu_fields) for menu in models.Menu.query.order_by(models.Menu.id.desc()).all()]
+        """Gets all meals on the menu"""
+        menus = [marshal(menu, menu_fields) for menu in models.Meal.query.filter_by(in_menu=True).all()]
         return make_response(jsonify({'menu': menus}), 200)
 
 
 class Menu(Resource):
-    """Contains GET, PUT and DELETE methods for manipulating a single menu option"""
+    """Contains GET and delete methods for manipulating a menu item"""
 
-
-    def __init__(self):
-        self.reqparse = reqparse.RequestParser()
-        self.reqparse.add_argument(
-            'menu_option',
-            required=True,
-            type=inputs.regex(r"(.*\S.*)"),
-            help='kindly provide a menu option',
-            location=['form', 'json'])
-        super().__init__()
 
     @token_required
-    def get(self, menu_id):
-        """Get a particular menu option"""
-        response = models.Menu.get_menu(menu_id)
+    def get(self, meal_id):
+        """Get a particular meal on the menu"""
+        response = models.Meal.get_menu(meal_id)
         return response
 
     @admin_required
-    def put(self, menu_id):
-        """Update a particular menu option"""
-        kwargs = self.reqparse.parse_args()
-        response = models.Menu.update_menu(
-            menu_id=menu_id,
-            menu_option=kwargs.get('menu_option'))
+    def delete(self, meal_id):
+        """Remove a particular meal from the menu"""
+        response = models.Meal.remove_from_menu(meal_id)
         return response
 
-    @admin_required
-    def delete(self, menu_id):
-        """Delete a particular menu option"""
-        response = models.Menu.delete_menu(menu_id)
-        return response
 
 
 class OrderList(Resource):
@@ -180,15 +177,16 @@ class OrderList(Resource):
 
 
     def __init__(self):
-        self.now = datetime.datetime.utcnow() # timer
-        self.closing = datetime.time(23, 0, 0)
+        self.now = datetime.datetime.utcnow().hour
+        self.opening = datetime.time(8, 0, 0).hour
+        self.closing = datetime.time(20, 0, 0).hour
 
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
-            'order_item',
+            'meal_id',
             required=True,
-            type=inputs.regex(r"(.*\S.*)"),
-            help='kindly provide an order item',
+            type=int,
+            help='kindly provide a valid meal_id',
             location=['form', 'json'])
         super().__init__()
 
@@ -196,17 +194,15 @@ class OrderList(Resource):
     def post(self):
         """Creates a new order"""
         kwargs = self.reqparse.parse_args()
-        if self.now.hour < self.closing.hour:
+        if self.opening < self.now < self.closing:
             token = request.headers['x-access-token']
             data = jwt.decode(token, config.Config.SECRET_KEY)
             user_id = data['id']
-            client = models.User.query.get(user_id)
-            response = models.Order.create_order(
-                order_item=kwargs.get('order_item'),
-                client_id=client.id,
-                client_email=client.email)
+            user = models.User.query.get(user_id)
+            response = models.Order.create_order(user=user, meal_id=kwargs.get('meal_id'))
             return response
-        return make_response(jsonify({"message" : "sorry, we do not take orders past 11PM"}), 200)
+
+        return make_response(jsonify({"message" : "sorry, we are only open between 8AM and 8PM"}), 200)
 
 
     @token_required
@@ -216,28 +212,30 @@ class OrderList(Resource):
         data = jwt.decode(token, config.Config.SECRET_KEY)
         admin = data['admin']
         user_id = data['id']
-        user_orders = [marshal(order, order_fields) for order in models.Order.query.filter_by(client_id=user_id).all()]
+        user_orders = [marshal(order, order_fields) for order in models.Order.query.filter_by(user_id=user_id).all()]
 
         if admin:
             orders = [marshal(order, order_fields) for order in models.Order.query.order_by(models.Order.id.desc()).all()]
             return make_response(jsonify({'orders': orders}), 200)
+
         return make_response(jsonify({'your orders': user_orders}), 200)
 
 
 class Order(Resource):
-    """Contains GET, PUT and DELETE methods for manipulating a single order"""
+    """Contains GET, PUT and DELETE methods for manipulating an order"""
 
 
     def __init__(self):
-        self.now = datetime.datetime.utcnow() # timer
-        self.closing = datetime.time(23, 0, 0)
+        self.now = datetime.datetime.utcnow().hour
+        self.opening = datetime.time(8, 0, 0).hour
+        self.closing = datetime.time(20, 0, 0).hour
 
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
-            'order_item',
+            'meal_id',
             required=True,
-            type=inputs.regex(r"(.*\S.*)"),
-            help='kindly provide an order item',
+            type=int,
+            help='kindly provide a valid meal_id',
             location=['form', 'json'])
         super().__init__()
 
@@ -248,7 +246,7 @@ class Order(Resource):
         data = jwt.decode(token, config.Config.SECRET_KEY)
         admin = data['admin']
         user_id = data['id']
-        order = models.Order.query.filter_by(client_id=user_id, id=order_id).first()
+        order = models.Order.query.filter_by(user_id=user_id, id=order_id).first()
         response = models.Order.get_order(order_id)
 
         if admin:
@@ -257,13 +255,16 @@ class Order(Resource):
         if order is None:
             return make_response(jsonify({
                 "message" : "order does not exists or it does not belong to you"}), 404)
-        return response
 
+        if response is None:
+            return make_response(jsonify({"message" : "order does not exists"}), 404)
+
+        return response
 
     @token_required
     def put(self, order_id):
         """Update a particular order"""
-        if self.now.hour < self.closing.hour:
+        if self.opening < self.now < self.closing:
             kwargs = self.reqparse.parse_args()
             token = request.headers['x-access-token']
             data = jwt.decode(token, config.Config.SECRET_KEY)
@@ -274,13 +275,15 @@ class Order(Resource):
             if order is None:
                 return make_response(jsonify({"message" : "order does not exists"}), 404)
 
-            if admin or order.client_id == user_id:
+            if admin or order.user_id == user_id:
                 response = models.Order.update_order(
-                    order_id=order_id, order_item=kwargs.get('order_item'))
+                    order_id=order_id, meal_id=kwargs.get('meal_id'))
                 return response
+
             return make_response(jsonify({
                 "message" : "sorry, you cannot update this order since it does not belong to you"}), 401)
-        return make_response(jsonify({"message" : "sorry, we do not take orders past 11PM"}), 200)
+
+        return make_response(jsonify({"message" : "sorry, we are only open between 8AM and 8PM"}), 200)
 
 
     @token_required
@@ -295,7 +298,7 @@ class Order(Resource):
         if order is None:
             return make_response(jsonify({"message" : "order does not exists"}), 404)
 
-        if admin or order.client_id == user_id:
+        if admin or order.user_id == user_id:
             response = models.Order.delete_order(order_id)
             return response
         return make_response(jsonify({
@@ -308,7 +311,7 @@ api.add_resource(MealList, '/meals', endpoint='meals')
 api.add_resource(Meal, '/meals/<int:meal_id>', endpoint='meal')
 
 api.add_resource(MenuList, '/menu', endpoint='menus')
-api.add_resource(Menu, '/menu/<int:menu_id>', endpoint='menu')
+api.add_resource(Menu, '/menu/<int:meal_id>', endpoint='menu')
 
 api.add_resource(OrderList, '/orders', endpoint='orders')
 api.add_resource(Order, '/orders/<int:order_id>', endpoint='order')

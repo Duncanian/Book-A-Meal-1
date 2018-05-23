@@ -2,21 +2,22 @@
 """
 import datetime
 
-from flask import Blueprint, jsonify, make_response
+from flask import Blueprint, jsonify, make_response, request
 from flask_restful import Resource, Api, reqparse, inputs, marshal, fields
 from werkzeug.security import check_password_hash
 import jwt
 
 import models
 import config
-from .auth import admin_required
+from .auth import admin_required, token_required
 
 
 user_fields = {
     'id' : fields.Integer,
     'username': fields.String,
     'email': fields.String,
-    'admin': fields.Boolean
+    'admin': fields.Boolean,
+    'orders' : fields.List(fields.String) # list of strings
 }
 
 
@@ -52,16 +53,7 @@ class Signup(Resource):
             trim=True,
             help='kindly provide a valid confirmation password',
             location=['form', 'json'])
-        self.reqparse.add_argument(
-            'admin',
-            required=False,
-            nullable=True,
-            default=False,
-            help='kindly provide a valid boolean value',
-            type=bool,
-            location=['form', 'json'])
         super().__init__()
-
 
     def post(self):
         """Register a new user"""
@@ -72,7 +64,7 @@ class Signup(Resource):
                     username=kwargs.get('username'),
                     email=kwargs.get('email'),
                     password=kwargs.get('password'),
-                    admin=False) # you cannot create an admin user through the signup endpoint
+                    admin=False) # all users created through the signup endpoint are non-admins
 
                 return response
             return make_response(jsonify({"message" : "password should be at least 8 characters"}), 400)
@@ -99,7 +91,6 @@ class Login(Resource):
             help='kindly provide a valid password',
             location=['form', 'json'])
         super().__init__()
-
 
     def post(self):
         """login a user by providing a token"""
@@ -163,12 +154,11 @@ class UserList(Resource):
             nullable=True,
             default=False,
             help='kindly provide a valid boolean value',
-            type=bool,
+            type=inputs.boolean,
             location=['form', 'json'])
         super().__init__()
 
-
-    # to be secured in th near future
+    @admin_required
     def post(self):
         """Create a new user who can have admin privilege"""
         kwargs = self.reqparse.parse_args()
@@ -229,7 +219,7 @@ class User(Resource):
             nullable=True,
             default=False,
             help='kindly provide a valid boolean value',
-            type=bool,
+            type=inputs.boolean,
             location=['form', 'json'])
         super().__init__()
 
@@ -257,11 +247,73 @@ class User(Resource):
         return make_response(jsonify({"message" : "password and confirm password should be identical"}), 400)
 
 
-    @admin_required
+    @token_required
     def delete(self, user_id):
         """Delete a particular user"""
-        response = models.User.delete_user(user_id)
-        return response
+        token = request.headers['x-access-token']
+        data = jwt.decode(token, config.Config.SECRET_KEY)
+        admin = data['admin']
+        user_id = data['id']
+        user = models.User.query.get(user_id)
+
+        if admin or user.id == user_id:
+            response = models.User.delete_user(user_id)
+            return response
+
+        return make_response(jsonify({
+                "message" : "sorry, you cannot delete this account since it does not belong to you"}), 401)
+
+
+class ResetPassword(Resource):
+    "Contains a POST method to reset your password"
+
+
+    def __init__(self):
+        """Validates both json and form-data input"""
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument(
+            'current_password',
+            required=True,
+            trim=True,
+            help='kindly provide a valid password',
+            location=['form', 'json'])
+        self.reqparse.add_argument(
+            'new_password',
+            required=True,
+            trim=True,
+            help='kindly provide a valid password',
+            location=['form', 'json'])
+        self.reqparse.add_argument(
+            'confirm_password',
+            required=True,
+            trim=True,
+            help='kindly provide a valid confirmation password',
+            location=['form', 'json'])
+        super().__init__()
+        
+    @token_required
+    def post(self):
+        """Reset user's password"""
+        kwargs = self.reqparse.parse_args()
+        token = request.headers['x-access-token']
+        data = jwt.decode(token, config.Config.SECRET_KEY)
+        user_id = data['id']
+        user = models.User.query.get(user_id)
+
+        if check_password_hash(user.password, kwargs.get('current_password')):
+            if kwargs.get('current_password') != kwargs.get('new_password'):
+                if kwargs.get('new_password') == kwargs.get('confirm_password'):
+                    if len(kwargs.get('new_password')) >= 8:
+                        response = models.User.reset_password(
+                            user_id=user.id,
+                            password=kwargs.get('new_password'))
+
+                        return response
+                    return make_response(jsonify({"message" : "password should be at least 8 characters"}), 400)
+                return make_response(jsonify({"message" : "new password and confirm password should be identical"}), 400)
+            return make_response(jsonify({"message" : "current password and new password are identical"}), 400)
+        return make_response(jsonify({"message" : "invalid password"}), 400)
+
 
 
 users_api = Blueprint('resources.users', __name__)
@@ -270,3 +322,4 @@ api.add_resource(Signup, '/auth/signup', endpoint='signup')
 api.add_resource(Login, '/auth/login', endpoint='login')
 api.add_resource(UserList, '/users', endpoint='users')
 api.add_resource(User, '/users/<int:user_id>', endpoint='user')
+api.add_resource(ResetPassword, '/reset', endpoint='reset')
