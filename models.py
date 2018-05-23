@@ -20,7 +20,7 @@ class User(db.Model):
     email = db.Column(db.String(250), unique=True, nullable=False)
     password = db.Column(db.String(250), nullable=False)
     admin = db.Column(db.Boolean)
-    orders = db.relationship('Order', backref=db.backref('user', lazy=True))
+    orders = db.relationship('Order', backref=db.backref('users', lazy=True))
 
     def __repr__(self):
         return '<user {}>'.format(self.username)
