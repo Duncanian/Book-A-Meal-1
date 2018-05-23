@@ -4,7 +4,7 @@ from os import getenv
 
 
 class Config(object):
-    """Base class with all the constant config variables"""
+    """Base class with all the fundamental config variables"""
     DEBUG = False
     TESTING = False
     SQLALCHEMY_TRACK_MODIFICATIONS = True
@@ -12,14 +12,14 @@ class Config(object):
 
 
 class TestingConfig(Config):
-    """Contains additional config variables required during testing"""
+    """Contains config variables required during testing"""
     DEBUG = True
     TESTING = True
     SQLALCHEMY_DATABASE_URI = getenv('TESTING_DATABASE_URI')
     
 
 class DevelopmentConfig(Config):
-    """Contains additional config variables required during development"""
+    """Contains config variables required during development"""
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = getenv('DEVELOPMENT_DATABASE_URI')
 
