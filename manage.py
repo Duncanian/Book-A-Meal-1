@@ -5,11 +5,10 @@ import sys
 from flask_script import Manager, prompt, prompt_pass
 from flask_migrate import Migrate, MigrateCommand
 
-from models import db, User
+import models
 from app import app
 
-
-migrate = Migrate(app, db)
+migrate = Migrate(app, models.db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
@@ -37,7 +36,7 @@ def createsuperuser():
     if not password == confirm_password:
         sys.exit('\n kindly ensure that password and confirm password are identical')
     
-    User.create_user(
+    models.User.create_user(
         username=username,
         email=email,
         password=password,
@@ -46,7 +45,7 @@ def createsuperuser():
 
 if __name__ == '__main__':
     manager.run()
-    db.create_all()
+    models.db.create_all()
 
 # $ python manage.py db init
 # $ python manage.py db migrate
