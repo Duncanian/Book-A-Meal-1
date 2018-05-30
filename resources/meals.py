@@ -198,8 +198,7 @@ class OrderList(Resource):
             token = request.headers['x-access-token']
             data = jwt.decode(token, config.Config.SECRET_KEY)
             user_id = data['id']
-            user = models.User.query.get(user_id)
-            response = models.Order.create_order(user=user, meal_id=kwargs.get('meal_id'))
+            response = models.Order.create_order(user_id=user_id, meal_id=kwargs.get('meal_id'))
             return response
 
         return make_response(jsonify({"message" : "sorry, we are only open between 8AM and 8PM"}), 200)
