@@ -14,13 +14,13 @@ class User(db.Model):
     """Contains user columns and methods to add, update and delete a user"""
 
 
-    __tablename__ = 'users'
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(250), nullable=False)
     email = db.Column(db.String(250), unique=True, nullable=False)
     password = db.Column(db.String(250), nullable=False)
     admin = db.Column(db.Boolean)
-    orders = db.relationship('Order', backref=db.backref('users', lazy=True))
+    orders = db.relationship('Order', backref=db.backref('user', lazy=True))
 
     def __repr__(self):
         return '<user {}>'.format(self.username)
@@ -259,25 +259,29 @@ class Order(db.Model):
     price = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     user_email = db.Column(db.String(250), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False) # tablename
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False) # tablename
 
     def __repr__(self):
         return '<order {}: {}>'.format(self.id, self.meal_name)
 
     @classmethod
-    def create_order(cls, meal_id, user):
+    def create_order(cls, meal_id, user_id):
         """Create a new order"""
         meal = Meal.query.get(meal_id)
+        user = User.query.get(user_id)
 
         if meal is None:
             return make_response(jsonify({"message" : "meal does not exists"}), 404)
+        
+        if user is None:
+            return make_response(jsonify({"message" : "user does not exists"}), 404)
 
         if not meal.in_menu:
             return make_response(jsonify({
                 "message" : "kindly ensure that this meal is in the menu"}), 400)
 
         new_order = cls(meal_id=meal.id, meal_name=meal.name,
-                        price=meal.price, user=user, user_email=user.email)
+                        price=meal.price, user_id=user.id, user_email=user.email)
         db.session.add(new_order)
         db.session.commit()
         return make_response(jsonify({
