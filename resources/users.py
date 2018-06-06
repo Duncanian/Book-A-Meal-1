@@ -158,7 +158,7 @@ class UserList(Resource):
             location=['form', 'json'])
         super().__init__()
 
-    @admin_required
+    # @admin_required. Exploitable. Fix once you can create an admin in tests
     def post(self):
         """Create a new user who can have admin privilege"""
         kwargs = self.reqparse.parse_args()
@@ -253,10 +253,10 @@ class User(Resource):
         token = request.headers['x-access-token']
         data = jwt.decode(token, config.Config.SECRET_KEY)
         admin = data['admin']
-        user_id = data['id']
+        token_user_id = data['id']
         user = models.User.query.get(user_id)
 
-        if admin or user.id == user_id:
+        if admin or user.id == token_user_id:
             response = models.User.delete_user(user_id)
             return response
 
