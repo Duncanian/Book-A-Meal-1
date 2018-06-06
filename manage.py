@@ -33,6 +33,9 @@ def createsuperuser():
     password = prompt_pass('superuser password')
     confirm_password = prompt_pass('confirm superuser password')
 
+    if len(password) < 8:
+        sys.exit('\n kindly ensure that the password is at leaast 8 characters long')
+
     if not password == confirm_password:
         sys.exit('\n kindly ensure that password and confirm password are identical')
     
