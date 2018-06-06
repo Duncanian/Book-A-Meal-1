@@ -110,10 +110,15 @@ class User(db.Model):
 
         if user is None:
             return make_response(jsonify({"message" : "user does not exists"}), 404)
+    
+        records = Order.query.filter_by(user_id=user.id).all()
+        orders = []
+        for record in records:
+            orders.append(str(record))
 
         info = {"user_id" : user.id, "email" : user.email,
                 "username" : user.username, "admin" : user.admin,
-                "orders" : user.orders}
+                "orders" : orders}
 
         return make_response(jsonify({user.id : info}), 200)
 
@@ -259,7 +264,7 @@ class Order(db.Model):
     price = db.Column(db.Integer, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     user_email = db.Column(db.String(250), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False) # tablename
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE')) # tablename
 
     def __repr__(self):
         return '<order {}: {}>'.format(self.id, self.meal_name)
