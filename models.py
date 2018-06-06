@@ -122,7 +122,7 @@ class Meal(db.Model):
     """Contains meal columns and methods to add, update and delete a meal"""
 
 
-    __tablename__ = 'meals'
+    __tablename__ = 'meal'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), nullable=False, unique=True)
     price = db.Column(db.Integer, nullable=False)
@@ -252,7 +252,7 @@ class Order(db.Model):
     """Contains order columns and methods to add, update and delete an order"""
 
 
-    __tablename__ = 'orders'
+    __tablename__ = 'order'
     id = db.Column(db.Integer, primary_key=True)
     meal_id = db.Column(db.Integer, nullable=False)
     meal_name = db.Column(db.String(250), nullable=False)
