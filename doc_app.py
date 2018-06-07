@@ -7,7 +7,7 @@ from flasgger import Swagger
 from app import create_app
 
 
-app = create_app('config.DevelopmentConfig')
+app = create_app('config.ProductionConfig')
 swagger = Swagger(app)
 
 
@@ -50,7 +50,30 @@ def login():
         required: true
     """
 
-# will be secured in the near future
+@app.route('/api/v2/auth/reset/', methods=["POST"])
+def reset():
+    """ endpoint for resetting one's password.
+    ---
+    parameters:
+      - name: x-access-token
+        in: header
+        type: string
+        required: true
+      - name: current_password
+        in: formData
+        type: string
+        required: true
+      - name: new_password
+        in: formData
+        type: string
+        required: true
+      - name: confirm_password
+        in: formData
+        type: string
+        required: true
+    """
+
+# to be be secured
 @app.route('/api/v2/users', methods=["POST"])
 def users_create():
     """ endpoint for creating users.
@@ -162,14 +185,19 @@ def create_meal():
         in: header
         type: string
         required: true
-      - name: meal_item
+      - name: name
         required: true
         in: formData
         type: string
       - name: price
         in: formData
-        type: float
+        type: integer
         required: true
+      - name: in_menu
+        in: formData
+        type: boolean
+        required: true
+        default: false
     """
 
 @app.route("/api/v2/meals", methods=["GET"])
@@ -207,18 +235,23 @@ def update_meal():
         in: header
         type: string
         required: true
-      - name: meal_item
-        required: true
-        in: formData
-        type: string
-      - name: price
-        in: formData
-        type: float
-        required: true
       - name: meal_id
         in: path
         type: integer
         required: true
+      - name: name
+        in: formData
+        type: string
+        required: true
+      - name: price
+        in: formData
+        type: integer
+        required: true
+      - name: in_menu
+        in: formData
+        type: boolean
+        required: true
+        default: false
     """
 
 @app.route('/api/v2/meals/<int:meal_id>', methods=["DELETE"])
@@ -247,10 +280,10 @@ def create_menu():
         in: header
         type: string
         required: true
-      - name: menu_option
-        required: true
+      - name: meal_id
         in: formData
-        type: string
+        type: integer
+        required: true
     """
 
 @app.route("/api/v2/menu", methods=["GET"])
@@ -264,7 +297,7 @@ def get_all_menu():
         required: true
     """
 
-@app.route("/api/v2/menu/<int:menu_id>", methods=["GET"])
+@app.route("/api/v2/menu/<int:meal_id>", methods=["GET"])
 def get_one_menu_option():
     """endpoint for getting a particular menu option.
     ---
@@ -273,41 +306,22 @@ def get_one_menu_option():
         in: header
         type: string
         required: true
-      - name: menu_id
+      - name: meal_id
         in: path
         type: integer
         required: true
     """
 
-@app.route('/api/v2/menu/<int:menu_id>', methods=["PUT"])
-def update_menu():
-    """ endpoint for updating an existing menu option.
-    ---
-    parameters:
-      - name: x-access-token
-        in: header
-        type: string
-        required: true
-      - name: menu_option
-        required: true
-        in: formData
-        type: string
-      - name: menu_id
-        in: path
-        type: integer
-        required: true
-    """
-
-@app.route('/api/v2/meals/<int:menu_id>', methods=["DELETE"])
+@app.route('/api/v2/menu/<int:meal_id>', methods=["DELETE"])
 def delete_menu():
-    """ endpoint for deleting an existing menu option.
+    """ endpoint for removing a meal form the menu.
     ---
     parameters:
       - name: x-access-token
         in: header
         type: string
         required: true
-      - name: menu_id
+      - name: meal_id
         in: path
         type: integer
         required: true
@@ -324,10 +338,10 @@ def create_order():
         in: header
         type: string
         required: true
-      - name: order_item
-        required: true
+      - name: meal_id
         in: formData
-        type: string
+        type: integer
+        required: true
     """
 
 @app.route("/api/v2/orders", methods=["GET"])
@@ -365,12 +379,12 @@ def update_order():
         in: header
         type: string
         required: true
-      - name: order_item
-        required: true
-        in: formData
-        type: string
       - name: order_id
         in: path
+        type: integer
+        required: true
+      - name: meal_id
+        in: formData
         type: integer
         required: true
     """
