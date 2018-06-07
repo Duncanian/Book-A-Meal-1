@@ -1,7 +1,5 @@
 """Contains all endpoints to manipulate meals, menu and orders information
 """
-import datetime
-
 from flask import jsonify, Blueprint, make_response, request
 from flask_restful import Resource, Api, reqparse, inputs, fields, marshal
 import jwt
@@ -177,10 +175,6 @@ class OrderList(Resource):
 
 
     def __init__(self):
-        self.now = datetime.datetime.utcnow().hour
-        self.opening = datetime.time(8, 0, 0).hour
-        self.closing = datetime.time(20, 0, 0).hour
-
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'meal_id',
@@ -194,15 +188,11 @@ class OrderList(Resource):
     def post(self):
         """Creates a new order"""
         kwargs = self.reqparse.parse_args()
-        if self.opening < self.now < self.closing:
-            token = request.headers['x-access-token']
-            data = jwt.decode(token, config.Config.SECRET_KEY)
-            user_id = data['id']
-            response = models.Order.create_order(user_id=user_id, meal_id=kwargs.get('meal_id'))
-            return response
-
-        return make_response(jsonify({"message" : "sorry, we are only open between 8AM and 8PM"}), 200)
-
+        token = request.headers['x-access-token']
+        data = jwt.decode(token, config.Config.SECRET_KEY)
+        user_id = data['id']
+        response = models.Order.create_order(user_id=user_id, meal_id=kwargs.get('meal_id'))
+        return response
 
     @token_required
     def get(self):
@@ -225,10 +215,6 @@ class Order(Resource):
 
 
     def __init__(self):
-        self.now = datetime.datetime.utcnow().hour
-        self.opening = datetime.time(8, 0, 0).hour
-        self.closing = datetime.time(20, 0, 0).hour
-
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'meal_id',
@@ -255,35 +241,28 @@ class Order(Resource):
             return make_response(jsonify({
                 "message" : "order does not exists or it does not belong to you"}), 404)
 
-        if response is None:
-            return make_response(jsonify({"message" : "order does not exists"}), 404)
-
         return response
 
     @token_required
     def put(self, order_id):
         """Update a particular order"""
-        if self.opening < self.now < self.closing:
-            kwargs = self.reqparse.parse_args()
-            token = request.headers['x-access-token']
-            data = jwt.decode(token, config.Config.SECRET_KEY)
-            admin = data['admin']
-            user_id = data['id']
-            order = models.Order.query.get(order_id)
+        kwargs = self.reqparse.parse_args()
+        token = request.headers['x-access-token']
+        data = jwt.decode(token, config.Config.SECRET_KEY)
+        admin = data['admin']
+        user_id = data['id']
+        order = models.Order.query.get(order_id)
 
-            if order is None:
-                return make_response(jsonify({"message" : "order does not exists"}), 404)
+        if order is None:
+            return make_response(jsonify({"message" : "order does not exists"}), 404)
 
-            if admin or order.user_id == user_id:
-                response = models.Order.update_order(
-                    order_id=order_id, meal_id=kwargs.get('meal_id'))
-                return response
+        if admin or order.user_id == user_id:
+            response = models.Order.update_order(
+                order_id=order_id, meal_id=kwargs.get('meal_id'))
+            return response
 
-            return make_response(jsonify({
-                "message" : "sorry, you cannot update this order since it does not belong to you"}), 401)
-
-        return make_response(jsonify({"message" : "sorry, we are only open between 8AM and 8PM"}), 200)
-
+        return make_response(jsonify({
+            "message" : "sorry, you cannot update this order since it does not belong to you"}), 401)
 
     @token_required
     def delete(self, order_id):
