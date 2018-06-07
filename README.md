@@ -73,12 +73,12 @@ Endpoint | Functionality
 ------------ | -------------
 POST   /api/v1/auth/signup | Register a user
 POST   /api/v1/auth/login | Log in user
+POST   /api/v1/auth/reset | Reset password
 POST   /api/v1/users | Create a user
 GET    /api/v1/users | Get all users
 GET   /api/v1/users/id | Get a single user
 PUT  /api/v1/users/id | Update a single user
 DELETE   /api/v1/users/id | Delete a single user
-POST   /api/v1/reset | Reset password
 POST   /api/v1/meals | Create new meal item
 GET   /api/v1/meals | Get all meal items
 GET   /api/v1/meals/id | Get a single meal item
