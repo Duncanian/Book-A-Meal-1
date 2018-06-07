@@ -261,7 +261,7 @@ class User(Resource):
             return response
 
         return make_response(jsonify({
-                "message" : "sorry, you cannot delete this account since it does not belong to you"}), 401)
+            "message" : "sorry, you cannot delete this account since it does not belong to you"}), 401)
 
 
 class ResetPassword(Resource):
@@ -290,7 +290,7 @@ class ResetPassword(Resource):
             help='kindly provide a valid confirmation password',
             location=['form', 'json'])
         super().__init__()
-        
+
     @token_required
     def post(self):
         """Reset user's password"""
@@ -322,4 +322,4 @@ api.add_resource(Signup, '/auth/signup', endpoint='signup')
 api.add_resource(Login, '/auth/login', endpoint='login')
 api.add_resource(UserList, '/users', endpoint='users')
 api.add_resource(User, '/users/<int:user_id>', endpoint='user')
-api.add_resource(ResetPassword, '/reset', endpoint='reset')
+api.add_resource(ResetPassword, '/auth/reset', endpoint='reset')
