@@ -15,29 +15,38 @@ class OrdersTests(BaseTests):
 
 
     def test_get_all(self):
-        """Tests admin successfully getting all order items"""
-        response = self.app.get('/api/v2/orders', headers=self.admin_header)
+        """Test admin successfully getting all order items"""
+        response = self.app.get('/api/v3/orders', headers=self.admin_header)
         self.assertEqual(response.status_code, 200)
 
     def test_owner_get_all(self):
-        """Tests user successfully getting all order items belonging to them"""
-        response = self.app.get('/api/v2/orders', headers=self.user_header)
+        """Test user successfully getting all order items belonging to him"""
+        response = self.app.get('/api/v3/orders', headers=self.user_header)
         self.assertEqual(response.status_code, 200)
 
     def test_successful_creation(self):
         """Tests successfully creating a new order item"""
-        order = json.dumps({"order_item" : "nyama choma"})
+        data = json.dumps({"meal_id" : 2})
         response = self.app.post(
-            '/api/v2/orders', data=order,
+            '/api/v3/orders', data=data,
             content_type='application/json',
             headers=self.user_header)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
 
-    def test_create_empty_name(self):
-        """Test unsuccessful order item creation because of empty name"""
-        data = json.dumps({"order_item" : ""})
+    def test_not_in_menu(self):
+        """Tests creating an order of meal not in menu"""
+        data = json.dumps({"meal_id" : 1})
         response = self.app.post(
-            '/api/v2/orders', data=data,
+            '/api/v3/orders', data=data,
+            content_type='application/json',
+            headers=self.user_header)
+        self.assertEqual(response.status_code, 400)
+
+    def test_create_empty_id(self):
+        """Test unsuccessful order creation because of empty id"""
+        data = json.dumps({"meal_id" : ""})
+        response = self.app.post(
+            '/api/v3/orders', data=data,
             content_type='application/json',
             headers=self.user_header)
         self.assertEqual(response.status_code, 400)

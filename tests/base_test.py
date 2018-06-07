@@ -16,12 +16,15 @@ db = models.db
 
 
 class BaseTests(unittest.TestCase):
-    """Authenticate a user and an admin and make the tokens available. Create a meal and menu option"""
+    """Authenticate a user and an admin and make the tokens available.
+    Create a meal and menu option and also create an order
+    """
 
 
     def setUp(self):
         """Authenticate a user and an admin and make the tokens available"""
         self.application = app.create_app('config.TestingConfig')
+
         user_reg = json.dumps({
             "username" : "user",
             "email" : "user@gmail.com",
@@ -35,29 +38,30 @@ class BaseTests(unittest.TestCase):
             "confirm_password" : "12345678",
             "admin" : True})
 
-        self.user_log = json.dumps({
-            "email" : "user@gmail.com",
-            "password" : "12345678"})
-
         admin_log = json.dumps({
             "email" : "admin@gmail.com",
+            "password" : "12345678"})
+
+        user_log = json.dumps({
+            "email" : "user@gmail.com",
             "password" : "12345678"})
 
         self.app = self.application.test_client()
 
         with self.application.app_context():
             db.create_all()
-            register_user = self.app.post(
-                '/api/v2/auth/signup', data=user_reg,
-                content_type='application/json')
-            register_admin = self.app.post(
-                '/api/v2/users', data=admin_reg,
-                content_type='application/json')
-            user_result = self.app.post(
-                '/api/v2/auth/login', data=self.user_log,
+
+            create_admin = self.app.post(
+                '/api/v3/users', data=admin_reg,
                 content_type='application/json')
             admin_result = self.app.post(
-                '/api/v2/auth/login', data=admin_log,
+                '/api/v3/auth/login', data=admin_log,
+                content_type='application/json')
+            register_user = self.app.post(
+                '/api/v3/auth/signup', data=user_reg,
+                content_type='application/json')
+            user_result = self.app.post(
+                '/api/v3/auth/login', data=user_log,
                 content_type='application/json')
             user_response = json.loads(user_result.get_data(as_text=True))
             user_token = user_response["token"]
@@ -67,17 +71,18 @@ class BaseTests(unittest.TestCase):
             admin_token = admin_response["token"]
             self.admin_header = {"Content-Type" : "application/json", "x-access-token" : admin_token}
 
-            meal = json.dumps({"meal_item" : "nyama choma", "price" : "200"})
-            menu = json.dumps({"menu_option" : "nyama choma"})
-            order = json.dumps({"order_item" : "nyama choma"})
+            meal = json.dumps({"name" : "ugali", "price" : "20", "in_menu" : False})
+            menu = json.dumps({"name" : "chapo", "price" : "20", "in_menu" : True})
+            order = json.dumps({"meal_id" : 2})
             create_meal = self.app.post(
-                '/api/v2/meals', data=meal, content_type='application/json',
+                '/api/v3/meals', data=meal, content_type='application/json',
                 headers=self.admin_header)
             create_menu = self.app.post(
-                '/api/v2/menu', data=menu, content_type='application/json',
+                '/api/v3/meals', data=menu, content_type='application/json',
                 headers=self.admin_header)
-            create_order = self.app.post(
-                '/api/v2/orders', data=order, content_type='application/json',
+            make_order = self.app.post(
+                '/api/v3/orders', data=order,
+                content_type='application/json',
                 headers=self.user_header)
 
     def tearDown(self):
