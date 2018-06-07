@@ -12,7 +12,7 @@ swagger = Swagger(app)
 
 
 # Users
-@app.route('/api/v2/auth/signup/', methods=["POST"])
+@app.route('/api/v3/auth/signup/', methods=["POST"])
 def signup():
     """ endpoint for registering users.
     ---
@@ -35,7 +35,7 @@ def signup():
         required: true
     """
 
-@app.route('/api/v2/auth/login', methods=["POST"])
+@app.route('/api/v3/auth/login', methods=["POST"])
 def login():
     """ endpoint for logging in users.
     ---
@@ -50,7 +50,7 @@ def login():
         required: true
     """
 
-@app.route('/api/v2/auth/reset/', methods=["POST"])
+@app.route('/api/v3/auth/reset/', methods=["POST"])
 def reset():
     """ endpoint for resetting one's password.
     ---
@@ -74,7 +74,7 @@ def reset():
     """
 
 # to be be secured
-@app.route('/api/v2/users', methods=["POST"])
+@app.route('/api/v3/users', methods=["POST"])
 def users_create():
     """ endpoint for creating users.
     ---
@@ -102,7 +102,7 @@ def users_create():
         default: false
     """
 
-@app.route("/api/v2/users", methods=["GET"])
+@app.route("/api/v3/users", methods=["GET"])
 def get_all_users():
     """endpoint for  getting all users.
      ---
@@ -113,7 +113,7 @@ def get_all_users():
         required: true
     """
 
-@app.route("/api/v2/users/<int:user_id>", methods=["GET"])
+@app.route("/api/v3/users/<int:user_id>", methods=["GET"])
 def get_one_user():
     """endpoint for  getting a particular user.
     ---
@@ -128,7 +128,7 @@ def get_one_user():
         required: true
     """
 
-@app.route('/api/v2/users/<int:user_id>', methods=["PUT"])
+@app.route('/api/v3/users/<int:user_id>', methods=["PUT"])
 def update_user():
     """ endpoint for updating an existing user.
     ---
@@ -159,7 +159,7 @@ def update_user():
         required: true
     """
 
-@app.route('/api/v2/users/<int:user_id>', methods=["DELETE"])
+@app.route('/api/v3/users/<int:user_id>', methods=["DELETE"])
 def delete_user():
     """ endpoint for deleting an existing user.
     ---
@@ -176,7 +176,7 @@ def delete_user():
 
 
 # Meals
-@app.route('/api/v2/meals', methods=["POST"])
+@app.route('/api/v3/meals', methods=["POST"])
 def create_meal():
     """ endpoint for creating a meal item.
     ---
@@ -200,7 +200,7 @@ def create_meal():
         default: false
     """
 
-@app.route("/api/v2/meals", methods=["GET"])
+@app.route("/api/v3/meals", methods=["GET"])
 def get_all_meals():
     """endpoint for getting all meals.
     ---
@@ -211,7 +211,7 @@ def get_all_meals():
         required: true
     """
 
-@app.route("/api/v2/meals/<int:meal_id>", methods=["GET"])
+@app.route("/api/v3/meals/<int:meal_id>", methods=["GET"])
 def get_one_meal():
     """endpoint for  getting a particular meal.
     ---
@@ -226,7 +226,7 @@ def get_one_meal():
         required: true
     """
 
-@app.route('/api/v2/meals/<int:meal_id>', methods=["PUT"])
+@app.route('/api/v3/meals/<int:meal_id>', methods=["PUT"])
 def update_meal():
     """ endpoint for updating an existing meal.
     ---
@@ -254,7 +254,7 @@ def update_meal():
         default: false
     """
 
-@app.route('/api/v2/meals/<int:meal_id>', methods=["DELETE"])
+@app.route('/api/v3/meals/<int:meal_id>', methods=["DELETE"])
 def delete_meal():
     """ endpoint for deleting an existing meal.
     ---
@@ -271,7 +271,7 @@ def delete_meal():
 
 
 # Menu
-@app.route('/api/v2/menu', methods=["POST"])
+@app.route('/api/v3/menu', methods=["POST"])
 def create_menu():
     """ endpoint for creating a menu option.
     ---
@@ -286,7 +286,7 @@ def create_menu():
         required: true
     """
 
-@app.route("/api/v2/menu", methods=["GET"])
+@app.route("/api/v3/menu", methods=["GET"])
 def get_all_menu():
     """endpoint for  getting all menu options.
     ---
@@ -297,7 +297,7 @@ def get_all_menu():
         required: true
     """
 
-@app.route("/api/v2/menu/<int:meal_id>", methods=["GET"])
+@app.route("/api/v3/menu/<int:meal_id>", methods=["GET"])
 def get_one_menu_option():
     """endpoint for getting a particular menu option.
     ---
@@ -312,7 +312,7 @@ def get_one_menu_option():
         required: true
     """
 
-@app.route('/api/v2/menu/<int:meal_id>', methods=["DELETE"])
+@app.route('/api/v3/menu/<int:meal_id>', methods=["DELETE"])
 def delete_menu():
     """ endpoint for removing a meal form the menu.
     ---
@@ -329,7 +329,7 @@ def delete_menu():
 
 
 # Orders
-@app.route('/api/v2/orders', methods=["POST"])
+@app.route('/api/v3/orders', methods=["POST"])
 def create_order():
     """ endpoint for creating an order item.
     ---
@@ -344,7 +344,7 @@ def create_order():
         required: true
     """
 
-@app.route("/api/v2/orders", methods=["GET"])
+@app.route("/api/v3/orders", methods=["GET"])
 def get_all_orders():
     """endpoint for  getting all orders.
     ---
@@ -355,7 +355,7 @@ def get_all_orders():
         required: true
     """
 
-@app.route("/api/v2/orders/<int:order_id>", methods=["GET"])
+@app.route("/api/v3/orders/<int:order_id>", methods=["GET"])
 def get_one_order():
     """endpoint for  getting a particular order.
     ---
@@ -370,7 +370,7 @@ def get_one_order():
         required: true
     """
 
-@app.route('/api/v2/orders/<int:order_id>', methods=["PUT"])
+@app.route('/api/v3/orders/<int:order_id>', methods=["PUT"])
 def update_order():
     """ endpoint for updating an existing order.
     ---
@@ -389,7 +389,7 @@ def update_order():
         required: true
     """
 
-@app.route('/api/v2/orders/<int:order_id>', methods=["DELETE"])
+@app.route('/api/v3/orders/<int:order_id>', methods=["DELETE"])
 def delete_order():
     """ endpoint for deleting an existing order.
     ---
