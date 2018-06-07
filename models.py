@@ -110,7 +110,7 @@ class User(db.Model):
 
         if user is None:
             return make_response(jsonify({"message" : "user does not exists"}), 404)
-    
+
         records = Order.query.filter_by(user_id=user.id).all()
         orders = []
         for record in records:
@@ -162,7 +162,7 @@ class Meal(db.Model):
 
         if meal is None:
             return make_response(jsonify({"message" : "meal does not exists"}), 404)
-        
+
         if meal.name == name and meal.price == price and meal.in_menu == in_menu:
             return make_response(jsonify({"message" : "No changes detected"}), 400)
 
@@ -193,7 +193,7 @@ class Meal(db.Model):
 
     @staticmethod
     def get_meal(meal_id):
-        """Gets a particular meal item"""
+        """Gets a particular meal"""
         meal = Meal.query.get(meal_id)
 
         if meal is None:
@@ -204,12 +204,13 @@ class Meal(db.Model):
 
     @staticmethod
     def add_to_menu(meal_id):
+        """Adds a particular meal to the menu"""
         meal = Meal.query.get(meal_id)
 
         if meal is None:
             return make_response(jsonify({"message" : "meal does not exists"}), 404)
 
-        if meal.in_menu == True:
+        if meal.in_menu:
             return make_response(jsonify({"message" : "meal already in the menu"}), 400)
 
         meal.in_menu = True
@@ -222,12 +223,13 @@ class Meal(db.Model):
 
     @staticmethod
     def remove_from_menu(meal_id):
+        """Removes a particular meal from the menu"""
         meal = Meal.query.get(meal_id)
 
         if meal is None:
             return make_response(jsonify({"message" : "meal does not exists"}), 404)
 
-        if meal.in_menu == False:
+        if not meal.in_menu:
             return make_response(jsonify({"message" : "meal already not in the menu"}), 400)
 
         meal.in_menu = False
@@ -240,6 +242,7 @@ class Meal(db.Model):
 
     @staticmethod
     def get_menu(meal_id):
+        """Gets a particular meal on the menu"""
         meal = Meal.query.get(meal_id)
 
         if meal is None:
@@ -277,7 +280,7 @@ class Order(db.Model):
 
         if meal is None:
             return make_response(jsonify({"message" : "meal does not exists"}), 404)
-        
+
         if user is None:
             return make_response(jsonify({"message" : "user does not exists"}), 404)
 
@@ -297,7 +300,7 @@ class Order(db.Model):
                                  "price" : new_order.price,
                                  "user_id" : new_order.user_id,
                                  "user_email" : new_order.user_email,
-                                 "created_at" : new_order.created_at}}), 200) # match status code for closed hours
+                                 "created_at" : new_order.created_at}}), 201)
 
     @staticmethod
     def update_order(order_id, meal_id):
@@ -307,7 +310,7 @@ class Order(db.Model):
 
         if order is None:
             return make_response(jsonify({"message" : "order does not exists"}), 404)
-    
+
         if meal is None:
             return make_response(jsonify({"message" : "meal does not exists"}), 404)
 
