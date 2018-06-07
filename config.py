@@ -16,12 +16,13 @@ class TestingConfig(Config):
     DEBUG = True
     TESTING = True
     SQLALCHEMY_DATABASE_URI = getenv('TESTING_DATABASE_URI')
-    
+
 
 class DevelopmentConfig(Config):
     """Contains config variables required during development"""
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = getenv('DEVELOPMENT_DATABASE_URI')
+
 
 class ProductionConfig(Config):
     """Contains config variables for use during production"""
