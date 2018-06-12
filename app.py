@@ -24,7 +24,7 @@ app = create_app('config.ProductionConfig')
 
 @app.route('/')
 def hello_world():
-    "test that flask app is running"
+    """test that flask app is running"""
     return 'Welcome to Book-A-Meal API'
 
 
