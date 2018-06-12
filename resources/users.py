@@ -2,7 +2,7 @@
 """
 import datetime
 
-from flask import Blueprint, jsonify, make_response, request
+from flask import Blueprint, jsonify, make_response, request, current_app
 from flask_restful import Resource, Api, reqparse, inputs, marshal, fields
 from werkzeug.security import check_password_hash
 import jwt
@@ -158,7 +158,7 @@ class UserList(Resource):
             location=['form', 'json'])
         super().__init__()
 
-    # @admin_required secure once you get alternative method to create test admin
+    @admin_required
     def post(self):
         """Create a new user who can have admin privilege"""
         kwargs = self.reqparse.parse_args()
@@ -315,6 +315,17 @@ class ResetPassword(Resource):
         return make_response(jsonify({"message" : "invalid password"}), 400)
 
 
+class TestAdmin(Resource):
+    def get(self):
+        """Create admin user to be used in tests. Wil run only when TESTING is True"""
+        if current_app.config['TESTING']:
+            response = models.User.create_user(
+                username="admin",
+                email="admin@gmail.com",
+                password="12345678",
+                admin=True)
+            return response
+
 
 users_api = Blueprint('resources.users', __name__)
 api = Api(users_api)
@@ -323,3 +334,4 @@ api.add_resource(Login, '/auth/login', endpoint='login')
 api.add_resource(UserList, '/users', endpoint='users')
 api.add_resource(User, '/users/<int:user_id>', endpoint='user')
 api.add_resource(ResetPassword, '/auth/reset', endpoint='reset')
+api.add_resource(TestAdmin, '/create_test_admin', endpoint='create_test_admin')
