@@ -50,8 +50,8 @@ class BaseTests(unittest.TestCase):
         with self.application.app_context():
             models.db.create_all()
 
-            create_admin = self.app.post(
-                '/api/v3/users', data=admin_reg,
+            create_admin = self.app.get(
+                '/api/v3/create_test_admin',
                 content_type='application/json')
             admin_result = self.app.post(
                 '/api/v3/auth/login', data=admin_log,
