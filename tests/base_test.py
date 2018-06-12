@@ -9,10 +9,9 @@ import sys # fix import errors
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import app
 import models
+import app
 
-db = models.db
 
 
 class BaseTests(unittest.TestCase):
@@ -25,18 +24,18 @@ class BaseTests(unittest.TestCase):
         """Authenticate a user and an admin and make the tokens available"""
         self.application = app.create_app('config.TestingConfig')
 
-        user_reg = json.dumps({
-            "username" : "user",
-            "email" : "user@gmail.com",
-            "password" : "12345678",
-            "confirm_password" : "12345678"})
-
         admin_reg = json.dumps({
             "username" : "admin",
             "email" : "admin@gmail.com",
             "password" : "12345678",
             "confirm_password" : "12345678",
             "admin" : True})
+
+        user_reg = json.dumps({
+            "username" : "user",
+            "email" : "user@gmail.com",
+            "password" : "12345678",
+            "confirm_password" : "12345678"})
 
         admin_log = json.dumps({
             "email" : "admin@gmail.com",
@@ -49,7 +48,7 @@ class BaseTests(unittest.TestCase):
         self.app = self.application.test_client()
 
         with self.application.app_context():
-            db.create_all()
+            models.db.create_all()
 
             create_admin = self.app.post(
                 '/api/v3/users', data=admin_reg,
@@ -87,5 +86,5 @@ class BaseTests(unittest.TestCase):
 
     def tearDown(self):
         with self.application.app_context():
-            db.session.remove()
-            db.drop_all()
+            models.db.session.remove()
+            models.db.drop_all()

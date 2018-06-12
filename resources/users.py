@@ -158,7 +158,7 @@ class UserList(Resource):
             location=['form', 'json'])
         super().__init__()
 
-    # @admin_required. Exploitable. Fix once you can create an admin in tests
+    # @admin_required secure once you get alternative method to create test admin
     def post(self):
         """Create a new user who can have admin privilege"""
         kwargs = self.reqparse.parse_args()
