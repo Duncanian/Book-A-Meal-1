@@ -1,5 +1,6 @@
-[![Build Status](https://travis-ci.org/lennykioko/Book-A-Meal.svg?branch=Develop-API-v1)](https://travis-ci.org/lennykioko/Book-A-Meal)
-[![Coverage Status](https://coveralls.io/repos/github/lennykioko/Book-A-Meal/badge.svg?branch=Develop-API-v1)](https://coveralls.io/github/lennykioko/Book-A-Meal?branch=Develop-API-v1)
+[![Build Status](https://travis-ci.org/lennykioko/Book-A-Meal.svg?branch=master)](https://travis-ci.org/lennykioko/Book-A-Meal)
+[![Coverage Status](https://coveralls.io/repos/github/lennykioko/Book-A-Meal/badge.svg?branch=master)](https://coveralls.io/github/lennykioko/Book-A-Meal?branch=master)
+[![PEP8](https://img.shields.io/badge/code%20style-pep8-green.svg)](https://www.python.org/dev/peps/pep-0008/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
@@ -41,7 +42,21 @@ $ source env/bin/activate
 $ pip install -r requirements.txt
 ```
 
-4. Run the development server
+4. Initialize environment variables
+
+```
+$ export SECRET_KEY=<SECRET KEY>
+$ export TESTING_DATABASE_URI=<URI>
+$ export DEVELOPMENT_DATABASE_URI=<URI>
+```
+
+5. Run migrations
+
+```
+$ python manage.py db upgrade
+```
+
+6. Run the development server
 
 ```
 $ python app.py
@@ -59,7 +74,8 @@ Endpoint | Functionality
 ------------ | -------------
 POST   /api/v1/auth/signup | Register a user
 POST   /api/v1/auth/login | Log in user
-POST   /api/v1/users | Register a user
+POST   /api/v1/auth/reset | Reset password
+POST   /api/v1/users | Create a user
 GET    /api/v1/users | Get all users
 GET   /api/v1/users/id | Get a single user
 PUT  /api/v1/users/id | Update a single user
@@ -99,7 +115,7 @@ pylint app.py
 
 ## Deployment
 
-Ensure you use Productionconfig settings which have DEBUG set to False
+Ensure you use ProductionConfig settings which have DEBUG set to False
 
 ## Built With
 
@@ -118,7 +134,7 @@ https://book-a-meal-api.herokuapp.com/apidocs
 
 ## Versioning
 
-Most recent version is version 1
+Most recent version is version 3
 
 ## Authors
 
