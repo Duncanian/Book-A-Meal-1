@@ -316,6 +316,9 @@ class ResetPassword(Resource):
 
 
 class TestAdmin(Resource):
+    "Contains a GET method to setup an admin to be used for testing"
+
+
     def get(self):
         """Create admin user to be used in tests. Wil run only when TESTING is True"""
         if current_app.config['TESTING']:
