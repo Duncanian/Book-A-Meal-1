@@ -45,6 +45,8 @@ def createsuperuser():
         password=password,
         admin=True)
 
+    sys.exit('\n superuser successfully created')
+
 
 if __name__ == '__main__':
     manager.run()
