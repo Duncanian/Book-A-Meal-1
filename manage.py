@@ -56,3 +56,4 @@ if __name__ == '__main__':
 # $ python manage.py db migrate
 # $ python manage.py db upgrade
 # $ python manage.py db --help
+# $ python manage.py createsuperuser
