@@ -23,7 +23,6 @@ class MenuList(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'meal_id',
-            required=True,
             type=int,
             help='kindly provide a valid meal_id',
             location=['form', 'json'])
@@ -33,8 +32,11 @@ class MenuList(Resource):
     def post(self):
         """Adds a meal to the menu"""
         kwargs = self.reqparse.parse_args()
-        response = models.Meal.add_to_menu(meal_id=kwargs.get('meal_id'))
-        return response
+        meal_id = kwargs.get('meal_id')
+        if meal_id:
+            response = models.Meal.add_to_menu(meal_id=meal_id)
+            return response
+        return make_response(jsonify({"message" : "missing meal_id"}), 400)
 
     @token_required
     def get(self):

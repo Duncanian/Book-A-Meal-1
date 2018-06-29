@@ -22,44 +22,51 @@ class Signup(Resource):
         self.reqparse.add_argument(
             'username',
             required=True,
-            help='kindly provide a valid username',
-            # match anything but newline + something not whitespace + anything but newline
-            type=inputs.regex(r"(.*\S.*)"),
+            help='missing username',
             location=['form', 'json']) # the one that comes last is looked at  first
         self.reqparse.add_argument(
             'email',
-            required=True,
+            type=inputs.regex(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"),
+            trim=True,
             help='kindly provide a valid email address',
-            location=['form', 'json'],
-            type=inputs.regex(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"))
+            location=['form', 'json'])
         self.reqparse.add_argument(
             'password',
             required=True,
             trim=True,
-            help='kindly provide a valid password',
+            help='missing password',
             location=['form', 'json'])
         self.reqparse.add_argument(
             'confirm_password',
             required=True,
             trim=True,
-            help='kindly provide a valid confirmation password',
+            help='missing confirmation password',
             location=['form', 'json'])
         super().__init__()
 
     def post(self):
         """Register a new user"""
         kwargs = self.reqparse.parse_args()
-        if kwargs.get('password') == kwargs.get('confirm_password'):
-            if len(kwargs.get('password')) >= 8:
-                response = models.User.create_user(
-                    username=kwargs.get('username'),
-                    email=kwargs.get('email'),
-                    password=kwargs.get('password'),
-                    admin=False) # all users created through the signup endpoint are non-admins
+        username =  kwargs.get('username').lstrip().rstrip()
+        email =  kwargs.get('email')
+        password =  kwargs.get('password')
+        confirm_password =  kwargs.get('confirm_password')
 
-                return response
-            return make_response(jsonify({"message" : "password should be at least 8 characters"}), 400)
-        return make_response(jsonify({"message" : "password and confirm password should be identical"}), 400)
+        if username:
+            if email:
+                if password == confirm_password:
+                    if len(password) >= 8:
+                        response = models.User.create_user(
+                            username=username,
+                            email=email,
+                            password=password,
+                            admin=False) # all users created through the signup endpoint are non-admins
+
+                        return response
+                    return make_response(jsonify({"message" : "password should be at least 8 characters"}), 400)
+                return make_response(jsonify({"message" : "password and confirm password should be identical"}), 400)
+            return make_response(jsonify({"message" : "missing email address"}), 400)
+        return make_response(jsonify({"message" : "kindly provide a valid username"}), 400)
 
 
 class Login(Resource):
@@ -71,15 +78,15 @@ class Login(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'email',
-            required=True,
+            type=inputs.regex(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"),
+            trim=True,
             help='kindly provide a valid email address',
-            location=['form', 'json'],
-            type=inputs.regex(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"))
+            location=['form', 'json'])
         self.reqparse.add_argument(
             'password',
             required=True,
             trim=True,
-            help='kindly provide a valid password',
+            help='missing password',
             location=['form', 'json'])
         super().__init__()
 
@@ -89,6 +96,9 @@ class Login(Resource):
         email = kwargs.get('email')
         password = kwargs.get('password')
         user = models.User.query.filter_by(email=email).first()
+
+        if not email:
+            return make_response(jsonify({"message" : "missing email address"}), 400)
 
         if user is None: # deliberately ambigous
             return make_response(jsonify({"message" : "invalid email address or password"}), 400)
@@ -118,19 +128,19 @@ class ResetPassword(Resource):
             'current_password',
             required=True,
             trim=True,
-            help='kindly provide a valid password',
+            help='missing current password',
             location=['form', 'json'])
         self.reqparse.add_argument(
             'new_password',
             required=True,
             trim=True,
-            help='kindly provide a valid password',
+            help='missing new password',
             location=['form', 'json'])
         self.reqparse.add_argument(
             'confirm_password',
             required=True,
             trim=True,
-            help='kindly provide a valid confirmation password',
+            help='missing confirmation password',
             location=['form', 'json'])
         super().__init__()
 
@@ -138,18 +148,21 @@ class ResetPassword(Resource):
     def post(self):
         """Reset user's password"""
         kwargs = self.reqparse.parse_args()
+        current_password = kwargs.get('current_password')
+        new_password = kwargs.get('new_password')
+        confirm_password = kwargs.get('confirm_password')
         token = request.headers['x-access-token']
         data = jwt.decode(token, config.Config.SECRET_KEY)
         user_id = data['id']
         user = models.User.query.get(user_id)
 
-        if check_password_hash(user.password, kwargs.get('current_password')):
-            if kwargs.get('current_password') != kwargs.get('new_password'):
-                if kwargs.get('new_password') == kwargs.get('confirm_password'):
-                    if len(kwargs.get('new_password')) >= 8:
+        if check_password_hash(user.password, current_password):
+            if current_password != new_password:
+                if new_password == confirm_password:
+                    if len(new_password) >= 8:
                         response = models.User.reset_password(
                             user_id=user.id,
-                            password=kwargs.get('new_password'))
+                            password=new_password)
 
                         return response
                     return make_response(jsonify({"message" : "password should be at least 8 characters"}), 400)

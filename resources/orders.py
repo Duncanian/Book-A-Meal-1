@@ -28,7 +28,6 @@ class OrderList(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'meal_id',
-            required=True,
             type=int,
             help='kindly provide a valid meal_id',
             location=['form', 'json'])
@@ -38,11 +37,15 @@ class OrderList(Resource):
     def post(self):
         """Creates a new order"""
         kwargs = self.reqparse.parse_args()
+        meal_id = kwargs.get('meal_id')
         token = request.headers['x-access-token']
         data = jwt.decode(token, config.Config.SECRET_KEY)
         user_id = data['id']
-        response = models.Order.create_order(user_id=user_id, meal_id=kwargs.get('meal_id'))
-        return response
+
+        if meal_id:
+            response = models.Order.create_order(user_id=user_id, meal_id=meal_id)
+            return response
+        return make_response(jsonify({"message" : "missing meal_id"}), 400)
 
     @token_required
     def get(self):
@@ -68,7 +71,6 @@ class Order(Resource):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
             'meal_id',
-            required=True,
             type=int,
             help='kindly provide a valid meal_id',
             location=['form', 'json'])
@@ -89,7 +91,7 @@ class Order(Resource):
 
         if order is None:
             return make_response(jsonify({
-                "message" : "order does not exists or it does not belong to you"}), 404)
+                "message" : "order does not belong to you"}), 404)
 
         return response
 
@@ -97,22 +99,26 @@ class Order(Resource):
     def put(self, order_id):
         """Update a particular order"""
         kwargs = self.reqparse.parse_args()
+        meal_id = kwargs.get('meal_id')
         token = request.headers['x-access-token']
         data = jwt.decode(token, config.Config.SECRET_KEY)
         admin = data['admin']
         user_id = data['id']
         order = models.Order.query.get(order_id)
 
+        if not meal_id:
+            return make_response(jsonify({"message" : "missing meal_id"}), 400)
+
         if order is None:
             return make_response(jsonify({"message" : "order does not exists"}), 404)
 
         if admin or order.user_id == user_id:
             response = models.Order.update_order(
-                order_id=order_id, meal_id=kwargs.get('meal_id'))
+                order_id=order_id, meal_id=meal_id)
             return response
 
         return make_response(jsonify({
-            "message" : "sorry, you cannot update this order since it does not belong to you"}), 401)
+            "message" : "order does not belong to you"}), 401)
 
     @token_required
     def delete(self, order_id):
@@ -130,7 +136,7 @@ class Order(Resource):
             response = models.Order.delete_order(order_id)
             return response
         return make_response(jsonify({
-                "message" : "sorry, you cannot delete this order since it does not belong to you"}), 401)
+                "message" : "order does not belong to you"}), 401)
 
 
 orders_api = Blueprint('resources.orders', __name__)

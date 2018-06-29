@@ -31,34 +31,31 @@ class UserList(Resource):
         self.reqparse.add_argument(
             'username',
             required=True,
-            help='kindly provide a valid username',
-            # match anything but newline + something not whitespace + anything but newline
-            type=inputs.regex(r"(.*\S.*)"),
-            location=['form', 'json']) # the one that comes last is looked at  first
+            trim=True,
+            help='missing username',
+            location=['form', 'json'])
         self.reqparse.add_argument(
             'email',
-            required=True,
+            type=inputs.regex(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"),
+            trim=True,
             help='kindly provide a valid email address',
-            location=['form', 'json'],
-            type=inputs.regex(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"))
+            location=['form', 'json'])
         self.reqparse.add_argument(
             'password',
             required=True,
             trim=True,
-            help='kindly provide a valid password',
+            help='missing password',
             location=['form', 'json'])
         self.reqparse.add_argument(
             'confirm_password',
             required=True,
             trim=True,
-            help='kindly provide a valid confirmation password',
+            help='missing confirmation password',
             location=['form', 'json'])
         self.reqparse.add_argument(
             'admin',
-            required=False,
-            nullable=True,
             default=False,
-            help='kindly provide a valid boolean value',
+            help='kindly provide a valid boolean as the admin value',
             type=inputs.boolean,
             location=['form', 'json'])
         super().__init__()
@@ -67,17 +64,27 @@ class UserList(Resource):
     def post(self):
         """Create a new user who can have admin privilege"""
         kwargs = self.reqparse.parse_args()
-        if kwargs.get('password') == kwargs.get('confirm_password'):
-            if len(kwargs.get('password')) >= 8:
-                response = models.User.create_user(
-                    username=kwargs.get('username'),
-                    email=kwargs.get('email'),
-                    password=kwargs.get('password'),
-                    admin=kwargs.get('admin'))
+        username =  kwargs.get('username').lstrip().rstrip()
+        email =  kwargs.get('email')
+        password =  kwargs.get('password')
+        confirm_password =  kwargs.get('confirm_password')
+        admin = kwargs.get('admin')
 
-                return response
-            return make_response(jsonify({"message" : "password should be at least 8 characters"}), 400)
-        return make_response(jsonify({"message" : "password and confirm password should be identical"}), 400)
+        if username:
+            if email:
+                if password == confirm_password:
+                    if len(password) >= 8:
+                        response = models.User.create_user(
+                            username=username,
+                            email=email,
+                            password=password,
+                            admin=admin)
+
+                        return response
+                    return make_response(jsonify({"message" : "password should be at least 8 characters"}), 400)
+                return make_response(jsonify({"message" : "password and confirm password should be identical"}), 400)
+            return make_response(jsonify({"message" : "missing email address"}), 400)
+        return make_response(jsonify({"message" : "kindly provide a valid username"}), 400)
 
     @admin_required
     def get(self):
@@ -96,34 +103,31 @@ class User(Resource):
         self.reqparse.add_argument(
             'username',
             required=True,
-            help='kindly provide a valid username',
-            # match anything but newline + something not whitespace + anything but newline
-            type=inputs.regex(r"(.*\S.*)"),
-            location=['form', 'json']) # the one that comes last is looked at  first
+            trim=True,
+            help='missing username',
+            location=['form', 'json'])
         self.reqparse.add_argument(
             'email',
-            required=True,
+            type=inputs.regex(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"),
+            trim=True,
             help='kindly provide a valid email address',
-            location=['form', 'json'],
-            type=inputs.regex(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"))
+            location=['form', 'json'])
         self.reqparse.add_argument(
             'password',
             required=True,
             trim=True,
-            help='kindly provide a valid password',
+            help='missing password',
             location=['form', 'json'])
         self.reqparse.add_argument(
             'confirm_password',
             required=True,
             trim=True,
-            help='kindly provide a valid confirmation password',
+            help='missing confirmation password',
             location=['form', 'json'])
         self.reqparse.add_argument(
             'admin',
-            required=False,
-            nullable=True,
             default=False,
-            help='kindly provide a valid boolean value',
+            help='kindly provide a valid boolean as the admin value',
             type=inputs.boolean,
             location=['form', 'json'])
         super().__init__()
@@ -138,19 +142,28 @@ class User(Resource):
     def put(self, user_id):
         """Update a particular user"""
         kwargs = self.reqparse.parse_args()
-        if kwargs.get('password') == kwargs.get('confirm_password'):
-            if len(kwargs.get('password')) >= 8:
-                response = models.User.update_user(
-                    user_id=user_id,
-                    username=kwargs.get('username'),
-                    email=kwargs.get('email'),
-                    password=kwargs.get('password'),
-                    admin=kwargs.get('admin'))
-                return response
+        username = kwargs.get('username')
+        email = kwargs.get('email')
+        password = kwargs.get('password')
+        confirm_password = kwargs.get('confirm_password')
+        admin = kwargs.get('admin')
 
-            return make_response(jsonify({"message" : "password should be at least 8 characters"}), 400)
-        return make_response(jsonify({"message" : "password and confirm password should be identical"}), 400)
+        if username:
+            if email:
+                if password == confirm_password:
+                    if len(password) >= 8:
+                        response = models.User.update_user(
+                            user_id=user_id,
+                            username=username,
+                            email=email,
+                            password=password,
+                            admin=admin)
 
+                        return response
+                    return make_response(jsonify({"message" : "password should be at least 8 characters"}), 400)
+                return make_response(jsonify({"message" : "password and confirm password should be identical"}), 400)
+            return make_response(jsonify({"message" : "missing email address"}), 400)
+        return make_response(jsonify({"message" : "kindly provide a valid username"}), 400)
 
     @token_required
     def delete(self, user_id):

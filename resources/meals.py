@@ -25,20 +25,19 @@ class MealList(Resource):
         self.reqparse.add_argument(
             'name',
             required=True,
-            type=inputs.regex(r"(.*\S.*)"),
-            help='kindly provide a valid name',
+            help='missing name',
             location=['form', 'json'])
         self.reqparse.add_argument(
             'price',
-            required=True,
             type=int,
-            help='kindly provide a price(should be a valid number)',
+            trim=True,
+            help='kindly provide a valid integer as the price',
             location=['form', 'json'])
         self.reqparse.add_argument(
             'in_menu',
-            required=True,
-            help='kindly provide a valid boolean value',
             type=inputs.boolean,
+            trim=True,
+            help='kindly provide a valid boolean as the in_menu value',
             location=['form', 'json'])
         super().__init__()
 
@@ -46,11 +45,22 @@ class MealList(Resource):
     def post(self):
         """Adds a new meal"""
         kwargs = self.reqparse.parse_args()
-        response = models.Meal.create_meal(
-            name=kwargs.get('name'),
-            price=kwargs.get('price'),
-            in_menu=kwargs.get('in_menu'))
-        return response
+        name =  kwargs.get('name').lstrip().rstrip()
+        price =  kwargs.get('price')
+        in_menu =  kwargs.get('in_menu')
+
+        if name:
+            if price:
+                if in_menu == True or in_menu == False: # catches no input provided without letting in invalid input
+                    response = models.Meal.create_meal(
+                        name=name,
+                        price=price,
+                        in_menu=in_menu)
+                    return response
+                return make_response(jsonify({"message" : "missing in_menu value"}), 400)    
+            return make_response(jsonify({"message" : "missing  price"}), 400)
+        return make_response(jsonify({"message" : "kindly provide a valid name"}), 400)
+        
 
     @admin_required
     def get(self):
@@ -68,20 +78,19 @@ class Meal(Resource):
         self.reqparse.add_argument(
             'name',
             required=True,
-            type=inputs.regex(r"(.*\S.*)"),
-            help='kindly provide a valid name',
+            help='missing name',
             location=['form', 'json'])
         self.reqparse.add_argument(
             'price',
-            required=True,
             type=int,
-            help='kindly provide a price(should be a valid number)',
+            trim=True,
+            help='kindly provide a valid integer as the price',
             location=['form', 'json'])
         self.reqparse.add_argument(
             'in_menu',
-            required=True,
-            help='kindly provide a valid boolean value',
             type=inputs.boolean,
+            trim=True,
+            help='kindly provide a valid boolean as the in_menu value',
             location=['form', 'json'])
         super().__init__()
 
@@ -95,12 +104,22 @@ class Meal(Resource):
     def put(self, meal_id):
         """Update a particular meal"""
         kwargs = self.reqparse.parse_args()
-        response = models.Meal.update_meal(
-            meal_id=meal_id,
-            name=kwargs.get('name'),
-            price=kwargs.get('price'),
-            in_menu=kwargs.get('in_menu'))
-        return response
+        name =  kwargs.get('name').lstrip().rstrip()
+        price =  kwargs.get('price')
+        in_menu =  kwargs.get('in_menu')
+
+        if name:
+            if price:
+                if in_menu == True or in_menu == False:
+                    response = models.Meal.update_meal(
+                        meal_id=meal_id,
+                        name=name,
+                        price=price,
+                        in_menu=in_menu)
+                    return response
+                return make_response(jsonify({"message" : "missing in_menu value"}), 400)    
+            return make_response(jsonify({"message" : "missing  price"}), 400)
+        return make_response(jsonify({"message" : "kindly provide a valid name"}), 400)
 
     @admin_required
     def delete(self, meal_id):
