@@ -51,7 +51,7 @@ class UsersTests(BaseTests):
         self.assertEqual(response.status_code, 201)
 
 
-    def test_user_empty_body(self):
+    def test_empty_body(self):
         """Test unsuccessful user creation because of empty body"""
         data = json.dumps({})
         response = self.app.post(
@@ -60,7 +60,7 @@ class UsersTests(BaseTests):
             headers=self.admin_header)
         self.assertEqual(response.status_code, 400)
 
-    def test_user_existing_email(self):
+    def test_existing_email(self):
         """Test unsuccessful user creation because of existing email"""
         data = json.dumps({
             "username" : "john", "email" : "johndoe@gmail.com",
@@ -75,7 +75,7 @@ class UsersTests(BaseTests):
             headers=self.admin_header)
         self.assertEqual(response.status_code, 400)
 
-    def test_user_diff_passwords(self):
+    def test_diff_passwords(self):
         """Test unsuccessful user creation because of unmatching passwords"""
         data = json.dumps({
             "username" : "felix", "email" : "felix@gmail.com",
@@ -86,7 +86,7 @@ class UsersTests(BaseTests):
             headers=self.admin_header)
         self.assertEqual(response.status_code, 400)
 
-    def test_user_short_passwords(self):
+    def test_short_passwords(self):
         """Test unsuccessful user creation because of short passwords"""
         data = json.dumps({
             "username" : "moses", "email" : "moses@gmail.com",
@@ -97,7 +97,7 @@ class UsersTests(BaseTests):
             headers=self.admin_header)
         self.assertEqual(response.status_code, 400)
 
-    def test_user_empty_username(self):
+    def test_empty_username(self):
         """Test unsuccessful user creation because of empty username"""
         data = json.dumps({
             "username" : "", "email" : "emptyusername@gmail.com",
@@ -108,10 +108,10 @@ class UsersTests(BaseTests):
             headers=self.admin_header)
         self.assertEqual(response.status_code, 400)
 
-    def test_user_empty_email(self):
+    def test_empty_email(self):
         """Test unsuccessful user creation because of empty email"""
         data = json.dumps({
-            "username" : "empty", "email" : "",
+            "username" : "empty",
             "password" : "secret12345", "confirm_password" : "secret12345"})
         response = self.app.post(
             '/api/v3/users', data=data,
@@ -119,7 +119,7 @@ class UsersTests(BaseTests):
             headers=self.admin_header)
         self.assertEqual(response.status_code, 400)
 
-    def test_user_invalid_email(self):
+    def test_invalid_email(self):
         """Test unsuccessful user creation because of invalid email"""
         data = json.dumps({
             "username" : "lenny", "email" : "invalidemail.com",
@@ -130,7 +130,7 @@ class UsersTests(BaseTests):
             headers=self.admin_header)
         self.assertEqual(response.status_code, 400)
 
-    def test_user_empty_password(self):
+    def test_empty_password(self):
         """Tests unsuccessful user creation because of empty password"""
         data = json.dumps({
             "username" : "lenny", "email" : "lennymutush@gmail.com",
@@ -141,7 +141,7 @@ class UsersTests(BaseTests):
             headers=self.admin_header)
         self.assertEqual(response.status_code, 400)
 
-    def test_user_empty_conf_password(self):
+    def test_empty_conf_password(self):
         """Tests unsuccessful user creation because of empty confirm_password"""
         data = json.dumps({
             "username" : "lenny", "email" : "confpassword@gmail.com",
@@ -152,7 +152,7 @@ class UsersTests(BaseTests):
             headers=self.admin_header)
         self.assertEqual(response.status_code, 400)
 
-    def test_user_whitespace_passwords(self):
+    def test_whitespace_passwords(self):
         """Tests unsuccessful user creation because of whitespace passwords"""
         data = json.dumps({"username" : "lenny", "email" : "lennykmutua@gmail.com",
                            "password" : "        ", "confirm_password" : "        "})

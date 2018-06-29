@@ -69,6 +69,15 @@ class OrderTests(BaseTests):
             headers=self.admin_header)
         self.assertEqual(response.status_code, 400)
 
+    def test_missing_in_menu(self):
+        """Test an order update with missing in menu value"""
+        data = json.dumps({})
+        response = self.app.put(
+            '/api/v3/orders/1',data=data,
+            content_type='application/json',
+            headers=self.admin_header)
+        self.assertEqual(response.status_code, 400)
+
     def test_successful_deletion(self):
         """Test a successful order_item deletion"""
         response = self.app.delete('/api/v3/orders/1', headers=self.admin_header)

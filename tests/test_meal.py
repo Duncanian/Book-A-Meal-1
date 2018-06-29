@@ -38,6 +38,42 @@ class MealTests(BaseTests):
             headers=self.admin_header)
         self.assertEqual(response.status_code, 200)
 
+    def test_missing_price(self):
+        """Test unsuccessful meal update because of missing price"""
+        data = json.dumps({"name" : "Pilau with spices", "in_menu" : False})
+        response = self.app.put(
+            '/api/v3/meals/1', data=data,
+            content_type='application/json',
+            headers=self.admin_header)
+        self.assertEqual(response.status_code, 400)
+
+    def test_missing_in_menu(self):
+        """Test unsuccessful meal update because of missing in_menu value"""
+        data = json.dumps({"name" : "Pilau with spices", "price" : 600})
+        response = self.app.put(
+            '/api/v3/meals/1', data=data,
+            content_type='application/json',
+            headers=self.admin_header)
+        self.assertEqual(response.status_code, 400)
+
+    def test_missing_name(self):
+        """Test unsuccessful meal update because of invalid name"""
+        data = json.dumps({"price" : 600, "in_menu" : False})
+        response = self.app.put(
+            '/api/v3/meals/1', data=data,
+            content_type='application/json',
+            headers=self.admin_header)
+        self.assertEqual(response.status_code, 400)
+
+    def test_invalid_name(self):
+        """Test unsuccessful meal update because of invalid name"""
+        data = json.dumps({"name" : " ", "price" : 600, "in_menu" : False})
+        response = self.app.put(
+            '/api/v3/meals/1', data=data,
+            content_type='application/json',
+            headers=self.admin_header)
+        self.assertEqual(response.status_code, 400)
+
     def test_update_same_info(self):
         """Test an update that provides the same info as before"""
         data = json.dumps({"name" : "ugali", "price" : "20", "in_menu" : "False"})

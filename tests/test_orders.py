@@ -44,9 +44,9 @@ class OrdersTests(BaseTests):
 
     def test_create_empty_id(self):
         """Test unsuccessful order creation because of empty id"""
-        data = json.dumps({"meal_id" : ""})
+        data = json.dumps({})
         response = self.app.post(
-            '/api/v3/orders', data=data,
+            '/api/v3/orders',data=data,
             content_type='application/json',
             headers=self.user_header)
         self.assertEqual(response.status_code, 400)

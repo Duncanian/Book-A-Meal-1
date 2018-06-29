@@ -40,6 +40,28 @@ class UsersTest(BaseTests):
             headers=self.admin_header)
         self.assertEqual(response.status_code, 200)
 
+    def test_misssing_email(self):
+        """Test unsuccessful user update because of missing email"""
+        data = json.dumps({
+            "username" : "user1",
+            "password" : "topsecret1", "confirm_password" : "topsecret1"})
+        response = self.app.put(
+            '/api/v3/users/1', data=data,
+            content_type='application/json',
+            headers=self.admin_header)
+        self.assertEqual(response.status_code, 400)
+
+    def test_invalid_username(self):
+        """Test unsuccessful user update because of invalid username"""
+        data = json.dumps({
+            "username" : " ", "email" : "user1@gmail.com",
+            "password" : "topsecret1", "confirm_password" : "topsecret1"})
+        response = self.app.put(
+            '/api/v3/users/1', data=data,
+            content_type='application/json',
+            headers=self.admin_header)
+        self.assertEqual(response.status_code, 400)
+
     def test_update_short_password(self):
         """Test unsuccessful user update because of short password"""
         data = json.dumps({

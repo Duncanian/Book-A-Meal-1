@@ -53,7 +53,16 @@ class MealsTests(BaseTests):
 
     def test_empty_name(self):
         """Tests unsuccessful meal creation because of empty name"""
-        data = json.dumps({"name" : "", "price" : 400, "in_menu" : False})
+        data = json.dumps({"price" : 400, "in_menu" : False})
+        response = self.app.post(
+            '/api/v3/meals', data=data,
+            content_type='application/json',
+            headers=self.admin_header)
+        self.assertEqual(response.status_code, 400)
+
+    def test_invalid_name(self):
+        """Tests unsuccessful meal creation because of invalid name"""
+        data = json.dumps({"name" : "   ", "price" : 400, "in_menu" : False})
         response = self.app.post(
             '/api/v3/meals', data=data,
             content_type='application/json',
@@ -62,7 +71,7 @@ class MealsTests(BaseTests):
 
     def test_empty_price(self):
         """Tests unsuccessful meal creation because of empty price"""
-        data = json.dumps({"name" : "Ugali and Chicken", "price" : "", "in_menu" : False})
+        data = json.dumps({"name" : "Ugali and Chicken", "in_menu" : False})
         response = self.app.post(
             '/api/v3/meals', data=data,
             content_type='application/json',
@@ -80,7 +89,7 @@ class MealsTests(BaseTests):
 
     def test_empty_in_menu(self):
         """Tests unsuccessful meal creation because of empty in_menu boolean"""
-        data = json.dumps({"name" : "Ugali and Chicken", "price" : "", "in_menu" : ""})
+        data = json.dumps({"name" : "Ugali and Chicken", "price" : 400})
         response = self.app.post(
             '/api/v3/meals', data=data,
             content_type='application/json',
@@ -89,7 +98,7 @@ class MealsTests(BaseTests):
 
     def test_invalid_in_menu(self):
         """Tests unsuccessful meal creation because of invalid in_menu boolean"""
-        data = json.dumps({"name" : "Ugali", "price" : "True"})
+        data = json.dumps({"name" : "Ugali", "price" : 400, "in_menu" : "present"})
         response = self.app.post(
             '/api/v3/meals', data=data,
             content_type='application/json',

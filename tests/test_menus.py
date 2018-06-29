@@ -62,10 +62,10 @@ class MenusTests(BaseTests):
         self.assertEqual(response.status_code, 400)
 
     def test_addition_empty_id(self):
-        """Test unsuccessful menu option creation because of empty id"""
-        data = json.dumps({"meal_id" : ""})
+        """Test unsuccessful menu option creation because of empty meal_id"""
+        data = json.dumps({})
         response = self.app.post(
-            '/api/v3/menu', data=data,
+            '/api/v3/menu',data=data,
             content_type='application/json',
             headers=self.admin_header)
         self.assertEqual(response.status_code, 400)

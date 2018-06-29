@@ -44,6 +44,11 @@ class LoginTests(BaseTests):
         response = self.app.post('/api/v3/auth/login', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
+    def test_missing_email(self):
+        """Test unsuccessful login because of missing email"""
+        data = json.dumps({"password" : "12345678"})
+        response = self.app.post('/api/v3/auth/login', data=data, content_type='application/json')
+        self.assertEqual(response.status_code, 400)
 
 if __name__ == '__main__':
     unittest.main()

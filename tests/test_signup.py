@@ -22,7 +22,7 @@ class SignupTests(BaseTests):
         response = self.app.post('/api/v3/auth/signup', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 201)
 
-    def test_signup_diff_passwords(self):
+    def test_diff_passwords(self):
         """Test unsuccessful signup because of unmatching passwords"""
         data = json.dumps({
             "username" : "felix", "email" : "felix@gmail.com",
@@ -30,7 +30,7 @@ class SignupTests(BaseTests):
         response = self.app.post('/api/v3/auth/signup', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
-    def test_signup_short_passwords(self):
+    def test_short_passwords(self):
         """Test unsuccessful signup because of short passwords"""
         data = json.dumps({
             "username" : "moses", "email" : "moses@gmail.com",
@@ -38,7 +38,7 @@ class SignupTests(BaseTests):
         response = self.app.post('/api/v3/auth/signup', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
-    def test_signup_empty_username(self):
+    def test_empty_username(self):
         """Test unsuccessful signup because of empty username"""
         data = json.dumps({
             "username" : "", "email" : "emptyusername@gmail.com",
@@ -46,7 +46,7 @@ class SignupTests(BaseTests):
         response = self.app.post('/api/v3/auth/signup', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
-    def test_signup_invalid_email(self):
+    def test_invalid_email(self):
         """Test unsuccessful signup because of invalid email"""
         data = json.dumps({
             "username" : "lenny", "email" : "invalidemail.com",
@@ -54,7 +54,15 @@ class SignupTests(BaseTests):
         response = self.app.post('/api/v3/auth/signup', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
-    def test_signup_empty_password(self):
+    def test_empty_email(self):
+        """Test unsuccessful signup because of empty email"""
+        data = json.dumps({
+            "username" : "lenny",
+            "password" : "secret12345", "confirm_password" : "secret12345"})
+        response = self.app.post('/api/v3/auth/signup', data=data, content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+
+    def test_empty_password(self):
         """Tests unsuccessful signup because of empty password"""
         data = json.dumps({
             "username" : "lenny", "email" : "lennymutush@gmail.com",
@@ -62,7 +70,7 @@ class SignupTests(BaseTests):
         response = self.app.post('/api/v3/auth/signup', data=data, content_type='application/json')
         self.assertEqual(response.status_code, 400)
 
-    def test_signup_empty_conf_password(self):
+    def test_empty_conf_password(self):
         """Tests unsuccessful signup because of empty confirm_password"""
         data = json.dumps({
             "username" : "lenny", "email" : "confpassword@gmail.com",
