@@ -1,8 +1,8 @@
 # custom files
 .pytest_cache
 .vscode
-env
-env.bat
+venv
+.env
 nodeids
 
 
